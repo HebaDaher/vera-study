@@ -267,6 +267,37 @@ details.qa .a b{color:var(--navy)}
 .pmeter .needle{position:absolute;top:-6px;width:4px;height:34px;background:var(--navy);border-radius:2px;transition:left .6s cubic-bezier(.3,1.4,.5,1)}
 .verdict{font-size:20px;font-weight:850;transition:.3s}
 .footer{text-align:center;color:var(--text3);font-size:12.5px;padding:30px 10px 50px}
+
+/* simple layer */
+.simple{background:linear-gradient(135deg,#ECFBF4,#F4FBFF);border:2px solid #9BDFC1;}
+.simple .lbl{background:#C9EEDB;color:#13724E;font-size:11.5px}
+.simple p{font-size:16.5px;line-height:1.65;color:#17324A}
+.simple .analogy{background:#fff;border-radius:10px;padding:8px 12px;margin-top:8px;font-size:15.5px;border:1px dashed #9BDFC1}
+.gl{border-bottom:2px dotted #4F7FE0;cursor:help;background:rgba(79,127,224,.06);border-radius:3px}
+.gl:hover{background:rgba(79,127,224,.16)}
+#glTip{position:absolute;z-index:200;display:none;max-width:290px;background:#1B2A4A;color:#fff;font-size:13.5px;line-height:1.45;padding:10px 12px;border-radius:10px;box-shadow:0 10px 30px rgba(27,42,74,.3);pointer-events:none}
+#glTip b{color:#ffd2b0}
+.story{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:var(--shadow);min-height:430px}
+.story p,.story li{font-size:17px;line-height:1.7}.story p{margin:8px 0}.story ol{padding-left:22px}
+.sc{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.sc .big{font-size:64px;line-height:1}
+.sc .row{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap}
+.sc .card2{background:var(--pale2);border:2px solid var(--line2);border-radius:14px;padding:10px 14px;font-size:14.5px;animation:pop .5s both}
+.sc .card2.good{background:var(--greenSoft);border-color:#9BDFC1}
+.sc .card2.bad{background:var(--redSoft);border-color:#f2bcbc}
+.sc .card2.warn{background:var(--amberSoft);border-color:#ecc85a}
+.sc .card2.hid{background:#fff;border:2px dashed #D24B4B;color:#a33;font-style:italic}
+.sc .row .card2:nth-child(2){animation-delay:.15s}.sc .row .card2:nth-child(3){animation-delay:.3s}.sc .row .card2:nth-child(4){animation-delay:.45s}.sc .row .card2:nth-child(5){animation-delay:.6s}
+.sc .bubble{background:var(--navy);color:#fff;border-radius:16px;padding:10px 16px;font-size:15px;animation:pop .5s .6s both;max-width:360px}
+.sc .arrowx{font-size:22px;font-weight:900;color:var(--text3)}
+.sc .formx{width:100%;max-width:380px;text-align:left}
+.sc .fx{border:1.5px solid var(--line2);border-radius:10px;padding:9px 12px;margin:6px 0;font-size:14.5px;display:flex;justify-content:space-between;animation:pop .45s both}
+.sc .fx.ai{border:2px dashed var(--purple);background:var(--purpleSoft)}.sc .fx.ai small{color:var(--purple);font-weight:700}
+.sc .fx.ok{background:var(--greenSoft);border-color:#9BDFC1}
+.sc .fx:nth-child(2){animation-delay:.2s}.sc .fx:nth-child(3){animation-delay:.4s}.sc .fx:nth-child(4){animation-delay:.7s}
+.sc .qbox{background:var(--amberSoft);border:2px solid #ecc85a;border-radius:14px;padding:12px 14px;font-size:14.5px;text-align:left;max-width:420px;animation:pop .5s .4s both}
+.sc .receipt{background:#FFF8EE;border:2px solid var(--orange);border-radius:6px;padding:12px 16px;text-align:left;font-size:14.5px;line-height:1.7;font-family:var(--mono);animation-delay:.3s}
+@media (max-width:900px){.story{grid-template-columns:1fr}}
 @media (max-width:900px){
   .hero,.grid2,.grid3,.grid4,.vs,.gates{grid-template-columns:1fr}
   .vs .mid{display:none}
@@ -288,6 +319,7 @@ details.qa .a b{color:var(--navy)}
     <div class="txt"><small>GP Teaching Tool</small><b>VERA</b></div>
   </div>
   <nav class="tabs" id="tabs">
+    <button class="tab" data-s="story" style="background:#E7F7EF;color:#13724E">★ Story (start here)</button>
     <button class="tab active" data-s="home"><span class="n">00</span>Start</button>
     <button class="tab" data-s="problem"><span class="n">01</span>Problem</button>
     <button class="tab" data-s="lit"><span class="n">02</span>Literature &amp; Gap</button>
@@ -299,9 +331,22 @@ details.qa .a b{color:var(--navy)}
     <button class="tab" data-s="proto"><span class="n">08</span>Prototype</button>
     <button class="tab" data-s="plan"><span class="n">09</span>Team &amp; Plan</button>
     <button class="tab" data-s="practice"><span class="n">10</span>Practice</button>
+    <button class="tab" data-s="dict">📖 Dictionary</button>
   </nav>
   <div class="prog">Understood: <b id="progN">0</b>/<span id="progT">0</span></div>
 </header>
+
+<!-- ===================== STORY ===================== -->
+<section class="section" id="story">
+<div class="wrap">
+  <div class="page-kicker">Start here · no background needed</div>
+  <div class="page-title">VERA explained as a story</div>
+  <div class="page-sub">12 short scenes. Read them in order and you will understand the whole project in about 10 minutes. Use the buttons below each scene.</div>
+  <div class="qbar"><i id="storyBar" style="width:8%"></i></div>
+  <div class="story" id="storyBox"><div id="storyArt"></div><div id="storyTxt"></div></div>
+  <div class="btnrow" style="justify-content:space-between;margin-top:14px"><button class="btn" id="storyPrev" onclick="storyStep(-1)">◀ Previous</button><span class="pill" id="storyN"></span><button class="btn primary" id="storyNext" onclick="storyStep(1)">Next scene ▶</button></div>
+</div>
+</section>
 
 <!-- ===================== HOME ===================== -->
 <section class="section active" id="home">
@@ -458,7 +503,7 @@ details.qa .a b{color:var(--navy)}
     <div class="topic-head"><span class="tnum">1</span><h2>Link 1 — Analytical decisions change conclusions</h2><span class="ref">§1.1 Background · [2] Steegen et al. 2016</span></div>
     <p>Every analysis needs choices: the <b>research question</b>, the <b>study design</b> (e.g. case-control, crossover), <b>variable types</b>, <b>sample quality</b> and <b>assumptions</b>. Researchers without a strong statistics background find these hard, and poor choices make results unreliable [1].</p>
     <p><b>Steegen et al. [2] — “multiverse analysis”:</b> instead of one analysis, they ran the <i>same data</i> through every reasonable data-preparation combination: <b>120 combinations</b>. Only <b>7</b> gave a statistically significant result. So the conclusion depended on preparation choices that most papers never report.</p>
-    <div class="diagram"><div id="multiverse" style="display:grid;grid-template-columns:repeat(20,1fr);gap:5px;padding:8px"></div>
+    <div class="diagram"><div id="multiverse" style="display:grid;grid-template-columns:repeat(20,1fr);gap:5px;padding:8px;max-width:640px;margin:0 auto"></div>
       <div class="legendrow" style="padding:0 8px"><span><i style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#F2843B;vertical-align:-1px"></i> significant (7)</span><span><i style="display:inline-block;width:11px;height:11px;border-radius:50%;background:#C9D5EA;vertical-align:-1px"></i> not significant (113)</span><span>Each dot = one defensible way to prepare the same dataset</span></div>
       <div class="btnrow" style="padding:0 8px"><button class="btn" onclick="runMultiverse()">▶ Run the 120 analyses</button></div></div>
     <div class="box why"><span class="lbl">💡 Why it matters for VERA</span><p>If the choice of path can flip the result, then the path must be <b>visible, justified and recorded</b>. That’s exactly what VERA’s analysis record does.</p></div>
@@ -1393,6 +1438,17 @@ details.qa .a b{color:var(--navy)}
   <div class="footer">VERA teaching tool · built from the midterm report, methodology, research proposal and the team’s UML diagrams · Canadian University Dubai · 2026</div>
 </div>
 </section>
+
+<!-- ===================== DICTIONARY ===================== -->
+<section class="section" id="dict">
+<div class="wrap">
+  <div class="page-kicker">Every technical word, in plain language</div>
+  <div class="page-title">📖 Dictionary</div>
+  <div class="page-sub">Type a word to search. Tip: anywhere in the tool, words with a <span class="gl" data-g="0">dotted underline</span> show their meaning when you hover or tap them.</div>
+  <input id="dictSearch" placeholder="Search e.g. p-value, sprint, actor…" style="width:100%;max-width:520px;padding:12px 16px;border:2px solid var(--line2);border-radius:12px;font:500 16px var(--font);margin-bottom:16px">
+  <div class="grid3" id="dictList"></div>
+</div>
+</section>
 <script>
 
 /* ================= core helpers ================= */
@@ -2083,5 +2139,237 @@ qzRender();
 refreshMarks();
 const last=store.get('tab','home');go($('#'+last)?last:'home');
 observeReveal();
+
+/* =====================================================================
+   SIMPLE-LANGUAGE LAYER: story, "in simple words" boxes, glossary tooltips
+   ===================================================================== */
+const SIMPLE={
+ 'h-pitch':['This is the speech you say at the start. In one breath: AI tools secretly make choices when they analyse data, so the answer can change and nobody knows why. VERA stops the secret choices: every choice is either taken from a written rulebook or asked to the researcher, and everything is written down so someone else can repeat it.','Like a cooking app that changes the recipe without telling you — VERA forces the recipe to be written down and approved.'],
+ 'h-rule':['The most important idea of the whole project. Before VERA runs any analysis, it looks at every choice and asks: “Did a written rule decide this?” If not: “Did the researcher answer it?” If neither → VERA refuses to run. It never guesses.','Like a bank that won’t send money unless there is either an automatic rule or your signature.'],
+ 'h-map':['The tool is a course. Go tab by tab from left to right. Start with the Story tab if you feel lost.',''],
+ 'p-chain':['The problem in five steps: (1) analysing data needs many small choices; (2) different choices can give different answers; (3) today AI makes those choices silently; (4) so results can’t be repeated or checked; (5) VERA makes every choice visible and checked before running.',''],
+ 'p-multi':['Researchers took ONE dataset and analysed it in 120 reasonable ways. Only 7 ways said “there is an effect”; 113 said “no effect”. So the answer depended on the choices, not only on the data.','Like asking 120 chefs to cook the same ingredients — you get very different dishes.'],
+ 'p-errors':['Even experts make mistakes: a study checked thousands of published psychology papers and about half had at least one number that didn’t match. Lesson: results must be checked, not trusted blindly.',''],
+ 'p-ai':['AI chatbots are good at naming the right test when you describe the study clearly. BUT: (1) their explanations can be wrong, (2) asking the same thing twice can give a different answer, (3) they guess things the file doesn’t say. So VERA uses AI only for helping, not deciding.','Like a smart friend who knows the answer to exam questions, but explains it wrong and gives a different answer every time you ask.'],
+ 'p-info':['A data file is just numbers. It can’t tell you HOW the study was done — e.g. were the two columns the same people twice, or different people? The correct test depends on that. Only the researcher knows, so VERA asks the researcher to declare it.','A photo of a cake can’t tell you if it has nuts — you have to ask the baker.'],
+ 'p-sim':['Play with the switches. Each switch is a normal, acceptable choice. Watch how the result jumps between “significant” and “not significant”. This is the problem VERA solves. (These numbers are invented just to show the idea.)',''],
+ 'p-pilot':['Our team ran its own small experiment: one real dataset, 24 acceptable ways of analysing it, repeated on many random samples. Result: when the sample has about 150–250 people (very common in student research), the choice of method alone decided the answer almost half of the time.','Same data, same question — but the “yes/no” answer depended on which acceptable method you picked.'],
+ 'p-stmt':['The problem statement = the problem in one paragraph. The research question = what our project will measure: “Does VERA’s way (rules + researcher confirmation + record) make AI-assisted analysis more correct and more repeatable than normal ways?”',''],
+ 'p-who':['VERA mainly helps beginners: master’s students, research assistants, small clinics — people without a statistician to ask, who use AI late at night and can’t tell when it is wrong.',''],
+ 'l-map':['The literature review = what other people already studied. Click each card. Every source helps VERA with one part, but none of them does everything together — that missing “all together” is our gap.',''],
+ 'l-std':['These are existing standards (official formats) VERA re-uses instead of inventing its own: one for writing rules as tables (DMN), one for checking a record is complete (JSON Schema), one for “who did what” (PROV-O), one for packaging files to share (RO-Crate).','Like using standard paper sizes (A4) instead of inventing your own — everyone can read it.'],
+ 'l-sec':['Security part. The biggest AI risk is “prompt injection”: hidden text inside a file tricks the AI into doing something wrong. VERA is safe from this because the AI isn’t allowed to make any important decision. Also, logs can’t be edited later, so nobody can cheat after seeing results.',''],
+ 'l-gap':['The “gap” = what nobody has done yet. Others did rule-based help (Tea, Tisane), others did repeatability checks (AIRepr), others did documentation (OSF). Nobody combined ALL of them in one tool. VERA sits in the middle of the three circles.',''],
+ 'c-table':['Competitors = other tools that do something similar. Each column is one feature VERA has. Green = yes, yellow = partly, red = no. VERA is the only row that is green everywhere (as a design — not built yet).',''],
+ 'c-map':['A simple picture: left = AI decides alone, right = rules + researcher decide. Bottom = no good record, top = full record anyone can repeat. VERA aims for the top-right corner.',''],
+ 'c-cards':['One sentence per competitor: what it is good at, what it lacks, and the line you can say to compare it with VERA.',''],
+ 'c-weak':['Every project has weaknesses — saying them yourself makes you look strong. VERA might block too many analyses, might ask too many questions, only covers some types of statistics, and isn’t tested yet.',''],
+ 's-three':['We considered 3 designs: (1) let AI do everything — easy but not reliable; (2) only strict rules — reliable but rigid; (3) mix: AI helps, rules check, researcher confirms, everything recorded. We chose 3 = VERA.','Intern (AI) drafts, rulebook checks, manager (researcher) signs, notary records.'],
+ 's-eval':['This table compares the 3 designs using what research papers found. Design 3 fits our goal best — but we are honest that it still needs to be tested.',''],
+ 's-llm':['The AI (the “language model”) is allowed only 3 jobs: Draft (fill the form for you to check), Suggest (propose labels for interview text), Explain (write results in simple words). It may NEVER choose the test, check rules, do the maths, or clean the data.','The AI is like an assistant who can write drafts but is not allowed to sign anything.'],
+ 's-game':['Practice: for each job, guess who does it in VERA. This makes the roles stick in your memory.',''],
+ 's-obj':['The objectives = the 7 things the project promises to do. Only O1 (prove the problem is real) is done. The others happen next semester.',''],
+ 's-scope':['Scope = what is included and what is not. VERA handles the most common types of student statistics. Harder types are left for later.',''],
+ 's-eval2':['How we will prove VERA works (next semester): (1) run tasks 10 times and see if the answer stays the same, (2) hide mistakes in tasks and see who catches them, (3) let real students use VERA vs a normal AI and let experts grade their work. The pass marks are decided in advance so we can’t cheat.',''],
+ 'm-why':['Methodology = HOW the team will build the software. Waterfall = do everything once in order (plan → build → test). Agile/Scrum = build in small pieces every 2 weeks and improve each time. We chose Scrum because our needs may change — plus 3 fixed checkpoints to protect the research.','Waterfall is building a whole house before showing anyone; Scrum is building one room at a time and showing it to the owner each time.'],
+ 'm-scrum':['We don’t use 100% official Scrum (we are part-time students), so we call it “Scrum-based”. Changes: 2-week work periods, our supervisor checks progress each time, one student orders the to-do list, the team leader role rotates, and we meet twice a week instead of daily.',''],
+ 'm-cycle':['One “sprint” (2 weeks) step by step: pick tasks from the to-do list → plan → build → show the result to the supervisor → discuss how to work better → repeat.',''],
+ 'm-slice':['Instead of finishing one layer completely (e.g. the whole form first), we first build one small but COMPLETE path through the whole system (a simple two-group comparison from start to end). Then we add more types later.','Like making one small but complete sandwich first, instead of baking all the bread before buying any filling.'],
+ 'm-core':['We build the parts without AI first. This proves VERA works even with no AI at all. AI helpers are added at the end.',''],
+ 'm-tdd':['Test-driven = for each statistics rule, first write a test with the correct answer, then write the rule until it passes. The practice tests are kept separate from the final exam tests so we can’t “study for the exam”.',''],
+ 'm-dod':['“Definition of Done” = a checklist. A task is only finished when all 4 boxes are ticked: code checked by teammates, rule tested and has a source, record format valid, and re-running gives the same answer.',''],
+ 'm-gates':['3 checkpoints where things get frozen: Gate 1 = design approved (end of this semester). Gate 2 = the record format is fixed. Gate 3 = the test plan is published publicly and ethics-approved before testing on people.','Like locking the exam questions in an envelope before the exam so nobody can change them after.'],
+ 'a-map':['The architecture = the big map of the system’s parts and how they talk. Click a box to read what it does. Press a “▶” scenario to watch a request move through the system step by step.',''],
+ 'a-trust':['Three zones: the browser (the user’s screen — not trusted), the VERA server (trusted — all real work happens here), and the external AI (not trusted). Three user types: Researcher (does the analysis), Verifier (checks it), Admin (manages accounts only).',''],
+ 'a-loop':['Whenever VERA can’t decide something by rules, it stops and asks the researcher with the evidence. The answer and the reason are saved, and VERA continues.',''],
+ 'a-record':['The analysis record = a complete “receipt” of the analysis: the study description, which data version, every choice and who made it, the checks, software versions and the results. It is locked so nobody can change it later. Click the buttons to see each part.',''],
+ 'a-verify':['Anyone with permission can take the receipt + the original data and re-run everything. If they get the same result → “Agreement”. If not → “Mismatch”. If the data was changed → “Failure”. The AI is not involved.',''],
+ 'u-uc':['A use case diagram shows WHO uses the system (stick figures = “actors”) and WHAT they can do (ovals = “use cases”). Lines connect actors to what they do. Dashed «include» = always happens too; dashed «extend» = happens only sometimes, under a condition.','Like a restaurant menu showing what customers, chefs and the manager can each do.'],
+ 'u-actA':['An activity diagram is a flowchart. Columns (“swimlanes”) show who does each step. Diamonds are decisions (yes/no). Press ▶ to follow the orange dot from uploading data to a fully approved analysis plan. No maths is run in this part.',''],
+ 'u-actB':['Part 2 of the flowchart: run the approved plan, make and lock the receipt, show results. On the right, a separate optional path: the verifier re-runs everything to check it.',''],
+ 'u-seq':['A sequence diagram shows the ORDER of messages between parts, top to bottom like a chat history. Solid arrow = “please do this”, dashed arrow = “here is the answer”. Press “message ▶” to see them one by one.','Like reading a WhatsApp group chat between the system’s parts.'],
+ 'u-cmp':['A component diagram shows the software building blocks (boxes) and which ones depend on which (dashed arrows). The arrow labels (starting with “I”) are the “interfaces” = the services one block offers another. Key point: no arrow connects the maths core to the AI.',''],
+ 'u-cls':['A class diagram shows the types of data VERA stores (boxes) and how they are linked (lines). Each box: name on top, data fields (–) in the middle, actions (+) at the bottom. Click a box for a plain explanation.','Like a family tree, but for data: who owns whom and how many.'],
+ 'u-sm':['A state machine shows the life of ONE analysis: the stages it goes through (rounded boxes) and what moves it to the next stage (arrows with labels). Press a path to watch the dot move.','Like tracking a parcel: ordered → packed → shipped → delivered (or returned).'],
+ 'pr-walk':['These are drawings (wireframes) of VERA’s screens, not real software yet. Click Next to follow a student through the 6 screens with one example study: does a sleep programme reduce exam anxiety?',''],
+ 'pr-conv':['Colour code on every screen: purple dashed = written by AI (must be checked), blue = decided by a rule, green = decided by the researcher, yellow = a question you must answer before continuing.',''],
+ 't-team':['Who is in the team and what each person is strong at. Everyone reviews each other’s work so no part depends on one person.',''],
+ 't-miles':['Important dates: proposal (25 Sep), midterm GP1 (23 & 27 Nov), GP2 plan (22 Jan), final GP2 (20 & 23 Apr).',''],
+ 't-s1':['This semester’s tasks and who owns them. Bar length = how many weeks it takes.',''],
+ 't-s2':['Next semester = 8 sprints that build the real VERA website, one feature group at a time.',''],
+ 't-status':['What is finished in the midterm report and what is still empty or needs fixing.',''],
+ 'x-flow':['A suggested order for your presentation slides, with what to say and how long.','']};
+
+const GLOSS=[
+ ['statistics','The maths used to analyse data and decide if a pattern is real or just chance.',/\bstatistics\b/i],
+ ['statistical test','A standard maths method that checks whether a difference or link in the data is real (e.g. t-test).',/\bstatistical tests?\b/i],
+ ['p-value','A number between 0 and 1. Small (below 0.05) usually means “the effect is probably real”; big means “could be chance”.',/\bp-values?\b/i],
+ ['significant','In statistics: the p-value is below 0.05, so the result is treated as a real effect.',/\b(statistically )?significan(t|ce)\b/i],
+ ['hypothesis','The statement you test, e.g. “the sleep programme lowers anxiety”.',/\bhypothes(is|es)\b/i],
+ ['dataset','A table of data (like an Excel sheet) — rows are people, columns are measurements.',/\bdatasets?\b/i],
+ ['variable','One column of data, e.g. age or anxiety score.',/\bvariables?\b/i],
+ ['sample size','How many people (rows) are in the data — written as n.',/\bsample sizes?\b/i],
+ ['assumption','A condition a test needs to be correct (e.g. groups have similar spread). If it is broken, the test may lie.',/\bassumptions?\b/i],
+ ['equal variances','The two groups have a similar spread of scores. Student’s t-test needs this.',/\b(un)?equal variances?\b/i],
+ ['Levene’s test','A check of whether two groups have equal spread (variance). Small p (e.g. .012) = spreads are different.',/\bLevene(’s|'s)?\b/],
+ ['t-test','A test that compares the averages of two groups. Student’s version assumes equal spread; Welch’s version doesn’t.',/\bt-tests?\b/i],
+ ['Welch’s t-test','A t-test that still works when the two groups have different spread.',/\bWelch(’s|'s)?\b/],
+ ['Mann–Whitney U','A test that compares two groups using ranks instead of averages — useful when data isn’t “normal”.',/\bMann[–-]Whitney\b/],
+ ['regression','A method that predicts one variable from others. Linear = predicts a number; logistic = predicts yes/no.',/\b(linear|logistic) regression\b/i],
+ ['contingency table','A table counting how many people fall in each category combination (e.g. smoker × illness).',/\bcontingency tables?\b/i],
+ ['association','Whether two variables move together (e.g. more sleep, less anxiety).',/\bassociations?\b/i],
+ ['outlier','A value very far from the others — it can distort results.',/\boutliers?\b/i],
+ ['missing values','Empty cells in the data. You must decide what to do with them, and that choice can change results.',/\bmissing(ness| values?| data)\b/i],
+ ['Likert','A rating scale like 1 = strongly disagree … 5 = strongly agree.',/\bLikert\b/i],
+ ['independent vs repeated','Independent = different people in each group. Repeated = the same people measured twice.',/\b(independent groups|repeated measures|repeated observations)\b/i],
+ ['experimental vs observational','Experimental = researcher assigned the treatment (e.g. randomly). Observational = just measured what already happened.',/\b(experimental|observational)\b/i],
+ ['confounder','A hidden third factor that affects both things you study (e.g. age affects both sleep and anxiety).',/\bconfounders?\b/i],
+ ['multiverse analysis','Running the same data through every reasonable analysis path to see how much the answer changes.',/\bmultiverse\b/i],
+ ['specification','One complete recipe for an analysis: which data, which preparation, which test.',/\bspecifications?\b/i],
+ ['reproducibility','Getting the SAME result when the analysis is run again, by you or someone else.',/\breproducib(le|ility)\b/i],
+ ['defensibility','Being able to justify every choice in the analysis if someone asks “why?”.',/\bdefensib(le|ility)\b/i],
+ ['LLM','Large Language Model — the AI behind chatbots like ChatGPT or Claude. It writes text by predicting words.',/\bLLMs?\b/],
+ ['language model','Same as LLM — the AI that reads and writes text.',/\blanguage models?\b/i],
+ ['prompt','The text you type to an AI.',/\bprompts?\b/i],
+ ['temperature','An AI setting for randomness. 0 = least random — but studies showed answers can still change.',/\btemperature\b/i],
+ ['deterministic','Always gives exactly the same output for the same input — no randomness, no AI guessing.',/\bdeterministic(ally)?\b/i],
+ ['rule engine','The part of VERA that applies the written rules to decide which tests are allowed.',/\brule engine\b/i],
+ ['rule library','The collection of written statistics rules, each with a version and a source.',/\brule library\b/i],
+ ['candidate','One possible analysis (test) that the rules say could fit the study.',/\bcandidates?\b/i],
+ ['admissible','Allowed to run: the rules support it AND its assumptions passed.',/\badmissib(le|ility)\b/i],
+ ['blocked','Stopped by the assumption gate because a required condition failed.',/\bblock(ed|s)?\b/i],
+ ['override','The researcher chooses to continue anyway, with a written reason that is saved.',/\boverrid(e|es|den)\b/i],
+ ['assumption gate','The checkpoint that tests each candidate’s conditions and blocks those that fail.',/\bassumption gate\b/i],
+ ['study declaration','A short form where the researcher states how the study was designed (goal, groups, variable roles…).',/\b(study )?declarations?\b/i],
+ ['data profile','VERA’s automatic measurement of the data: rows, missing cells, duplicates, outliers, group sizes.',/\b(data )?profil(e|er|ing)\b/i],
+ ['cross-check','Comparing what the researcher declared with what the data actually shows, to catch contradictions.',/\bcross-check(s|ed)?\b/i],
+ ['data preparation','Cleaning the data before analysis: handling missing values, removing duplicates, filtering rows.',/\b(data[- ])?preparation\b/i],
+ ['dataset version','A saved copy of the data after each change (v0 = original, v1 = cleaned…). The original is never overwritten.',/\b(dataset )?versions?\b/i],
+ ['hash (SHA-256)','A unique fingerprint code of a file. If even one number changes, the fingerprint changes — so tampering is detected.',/\b(hash(es|ed)?|SHA-256)\b/i],
+ ['analysis record','VERA’s complete “receipt” of an analysis: every choice, who made it, checks, versions and results.',/\banalysis records?\b/i],
+ ['JSON Schema','A standard way to check that a data file has all required fields in the right format.',/\bJSON Schema\b/],
+ ['PROV-O','A standard vocabulary for recording “who did what to which data”.',/\bPROV-O\b/],
+ ['RO-Crate','A standard way to package data + descriptions into one shareable folder.',/\bRO-Crates?\b/],
+ ['DMN','Decision Model and Notation — a standard for writing decision rules as readable tables.',/\bDMN\b/],
+ ['OSF / pre-registration','Open Science Framework — a website where you publish your plan BEFORE collecting data, so you can’t change it later.',/\b(OSF|pre-?regist(er|ered|ration))\b/i],
+ ['prompt injection','Hidden text inside a file or website that tricks an AI into doing something unintended.',/\bprompt injection\b/i],
+ ['OWASP','A respected organisation that publishes security guidelines for software.',/\bOWASP\b/],
+ ['ASVS','OWASP’s checklist of security requirements for web applications.',/\bASVS\b/],
+ ['audit log','A history of who did what and when. In VERA it is “append-only”: entries can be added but never edited or deleted.',/\b(audit log|append-only)\b/i],
+ ['immutable / locked','Cannot be changed after saving. Any change creates a new, linked version.',/\b(immutable|locked)\b/i],
+ ['verifier','An independent person who re-runs a locked analysis to check it gives the same result.',/\bverifiers?\b/i],
+ ['re-execute','Run the analysis again from the record, exactly as it was done.',/\bre-?execut(e|ed|es|ion)\b/i],
+ ['orchestrator','The “manager” part of VERA that controls the order of every step and records each decision.',/\borchestrator\b/i],
+ ['backend','The server side of the system where the real work happens (users don’t see it).',/\bbackend\b/i],
+ ['Web UI','The screens the user sees in their web browser.',/\bWeb UI\b/],
+ ['API','A way for one program to ask another program to do something.',/\bAPIs?\b/],
+ ['role-based access','Each user gets permissions according to their role (researcher, verifier, admin).',/\brole-based\b/i],
+ ['qualitative','Data made of words (interviews, comments) instead of numbers. “Coding” = labelling parts of the text with themes.',/\bqualitative\b/i],
+ ['benchmark','A fixed set of test tasks with known correct answers, used to measure how good a tool is.',/\bbenchmarks?\b/i],
+ ['seeded flaw','A mistake hidden on purpose in a test task, to see if the tool catches it.',/\bseeded\b/i],
+ ['false alarm','The tool blocks an analysis that an expert would say is fine.',/\bfalse[- ]alarms?\b/i],
+ ['counterbalanced','Half the participants use tool A first, half use tool B first — so order doesn’t bias results.',/\bcounterbalanced\b/i],
+ ['blinded','The expert graders don’t know which tool produced which answer.',/\bblinded\b/i],
+ ['effect size','How BIG a difference is (not just whether it exists).',/\beffect sizes?\b/i],
+ ['confidence interval','A range that likely contains the true value, e.g. 95% CI [0.53, 7.27].',/\b(confidence interval|95% CI|CI)\b/],
+ ['Scrum','An Agile way of working in short cycles (sprints) with regular reviews.',/\bScrum\b/],
+ ['Agile','Building software in small pieces and improving after each piece, instead of all at once.',/\bAgile\b/],
+ ['Waterfall','Doing each project phase once, in strict order (requirements → design → build → test).',/\bWaterfall\b/],
+ ['sprint','A fixed work period (here 2 weeks) that ends with something working to show.',/\bsprints?\b/i],
+ ['backlog','The ordered to-do list of everything the product needs.',/\bbacklog\b/i],
+ ['Product Owner','The team member who decides the order of the to-do list.',/\bProduct Owner\b/],
+ ['Scrum Master','The team member who keeps the Scrum process running smoothly (rotates in our team).',/\bScrum Master\b/],
+ ['stand-up','A very short team meeting: what I did, what I’ll do, what blocks me.',/\bstand-ups?\b/i],
+ ['retrospective','A meeting after each sprint about how to work better.',/\bretrospective\b/i],
+ ['increment','The working piece of software produced at the end of a sprint.',/\bincrement\b/i],
+ ['vertical slice','A thin feature that goes through ALL parts of the system from start to end.',/\bvertical slices?\b/i],
+ ['TDD','Test-Driven Development: write the test first, then the code that passes it.',/\b(TDD|test-first|test-driven)\b/i],
+ ['Definition of Done','The checklist that must be fully true before a task counts as finished.',/\bDefinition of Done\b/i],
+ ['gate','A fixed checkpoint where something is approved and frozen.',/\bgates?\b/i],
+ ['version control','A system (like Git) that saves every change to the code so you can see history and undo.',/\bversion control\b/i],
+ ['UML','Unified Modeling Language — standard diagram types for designing software.',/\bUML\b/],
+ ['use case','One thing a user can do with the system (an oval in the use case diagram).',/\buse cases?\b/i],
+ ['actor','Someone or something outside the system that uses it (stick figure).',/\bactors?\b/i],
+ ['«include»','The base use case ALWAYS also does the included one.',/«include»/],
+ ['«extend»','Extra behaviour that happens only SOMETIMES, under a condition in [brackets].',/«extend»/],
+ ['swimlane','A column in an activity diagram showing who does those steps.',/\bswimlanes?\b/i],
+ ['decision node','A diamond in a flowchart where the path splits depending on a condition.',/\bdecision (and merge )?nodes?\b/i],
+ ['fork/join','Bars in an activity diagram meaning steps happen AT THE SAME TIME.',/\bfork\/join\b/i],
+ ['lifeline','The dashed vertical line under each participant in a sequence diagram (its timeline).',/\blifelines?\b/i],
+ ['interface','A named service a component offers to others (e.g. IExecute = “run this”).',/\binterfaces?\b/i],
+ ['dependency','A dashed arrow meaning “this part needs that part’s service”.',/\bdependenc(y|ies)\b/i],
+ ['component','A building block of the software with a clear job.',/\bcomponents?\b/i],
+ ['class','A type of data object in the system (e.g. Study, Dataset, Decision).',/\bclass(es)?\b/i],
+ ['attribute','A piece of data a class stores (e.g. title, createdAt).',/\battributes?\b/i],
+ ['composition','A strong “owns” link (filled diamond): if the owner is deleted, the parts go too.',/\bcompos(ition|es)\b/i],
+ ['generalization','An “is a kind of” link (hollow triangle): Researcher is a kind of User.',/\bgeneralization\b/i],
+ ['multiplicity','The numbers on a line (1, 0..*, 1..*) saying how many objects can be linked.',/\bmultiplicit(y|ies)\b/i],
+ ['enumeration','A fixed list of allowed values (e.g. RULE, RESEARCHER).',/\benum(eration)?s?\b/i],
+ ['stereotype','A label in «guillemets» that adds meaning to a UML element, e.g. «immutable».',/\bstereotypes?\b/i],
+ ['state machine','A diagram of the stages something goes through and what moves it between them.',/\bstate machine\b/i],
+ ['guard','A condition in [brackets] that must be true for a transition to happen.',/\bguards?\b/i],
+ ['transition','An arrow in a state machine: moving from one stage to another.',/\btransitions?\b/i],
+ ['wireframe','A simple drawing of a screen layout, made before real coding.',/\bwireframes?\b/i],
+ ['prototype','An early model of the product used to show and test the idea.',/\bprototypes?\b/i]];
+
+/* ---- insert simple boxes ---- */
+for(const id in SIMPLE){const t=document.getElementById(id);if(!t)continue;const head=t.querySelector('.topic-head');const [txt,an]=SIMPLE[id];
+  const d=document.createElement('div');d.className='box simple';d.innerHTML=`<span class="lbl">🟢 In simple words</span><p>${txt}</p>${an?`<p class="analogy">💡 <b>Think of it like this:</b> ${an}</p>`:''}`;
+  if(head)head.insertAdjacentElement('afterend',d);else t.prepend(d);}
+
+/* ---- glossary tooltips ---- */
+(function(){const SKIP='svg,code,button,a,.tag,h1,h2,h3,h4,th,summary,.gl,.lbl,.chip,.dtab,.tab,.subnav,.mk,.qopt,.fc,.stat,.simple,script,style,.screen,.ref,.tnum,.detail,#dictList';
+  $$('.topic').forEach(topic=>{const used=new Set();const walker=document.createTreeWalker(topic,NodeFilter.SHOW_TEXT,{acceptNode:n=>{if(!n.nodeValue.trim())return NodeFilter.FILTER_REJECT;if(n.parentElement.closest(SKIP))return NodeFilter.FILTER_REJECT;return NodeFilter.FILTER_ACCEPT;}});
+    const nodes=[];while(walker.nextNode())nodes.push(walker.currentNode);
+    nodes.forEach(node=>{let text=node.nodeValue;let changed=false;const frag=document.createDocumentFragment();let guard=0;
+      while(guard++<20){let best=null;GLOSS.forEach((g,gi)=>{if(used.has(gi))return;const m=g[2].exec(text);if(m&&(!best||m.index<best.m.index))best={m,gi};});
+        if(!best)break;used.add(best.gi);changed=true;frag.appendChild(document.createTextNode(text.slice(0,best.m.index)));
+        const sp=document.createElement('span');sp.className='gl';sp.dataset.g=best.gi;sp.textContent=best.m[0];frag.appendChild(sp);text=text.slice(best.m.index+best.m[0].length);}
+      if(changed){frag.appendChild(document.createTextNode(text));node.parentNode.replaceChild(frag,node);}});});
+  const tip=document.createElement('div');tip.id='glTip';document.body.appendChild(tip);
+  const show=el=>{const g=GLOSS[+el.dataset.g];tip.innerHTML=`<b>${g[0]}</b><br>${g[1]}`;tip.style.display='block';const r=el.getBoundingClientRect();let left=r.left+window.scrollX;left=Math.min(left,window.scrollX+document.documentElement.clientWidth-300);tip.style.left=Math.max(8,left)+'px';tip.style.top=(r.bottom+window.scrollY+6)+'px';};
+  document.addEventListener('mouseover',e=>{const el=e.target.closest('.gl');if(el)show(el);});
+  document.addEventListener('mouseout',e=>{if(e.target.closest('.gl'))tip.style.display='none';});
+  document.addEventListener('click',e=>{const el=e.target.closest('.gl');if(el){show(el);e.stopPropagation();}else tip.style.display='none';});})();
+
+/* ---- dictionary tab ---- */
+function renderDict(q){q=(q||'').toLowerCase();$('#dictList').innerHTML=GLOSS.map(g=>[g[0],g[1]]).sort((a,b)=>a[0].localeCompare(b[0])).filter(g=>!q||g[0].toLowerCase().includes(q)||g[1].toLowerCase().includes(q)).map(g=>`<div class="mini"><h4>${g[0]}</h4><p>${g[1]}</p></div>`).join('')||'<p class="muted">No match.</p>';}
+$('#dictSearch').oninput=e=>renderDict(e.target.value);renderDict('');
+
+/* ---- story ---- */
+const STORY=[
+ {t:'Meet Mona 👩‍🎓',art:`<div class="sc"><div class="big floaty">👩‍🎓</div><div class="bubble">“Did my sleep programme reduce students’ exam anxiety?”</div><div class="row"><div class="card2">📄 84 students<br><small>half did the sleep programme, half didn’t</small></div><div class="card2">😰 anxiety score<br><small>for each student</small></div></div></div>`,
+  txt:'<p>Mona is a master’s student. She collected data from <b>84 students</b>: half joined a sleep programme, half didn’t. For each student she has an <b>anxiety score</b>.</p><p>Her question is simple: <b>did the programme lower anxiety?</b> To answer it she must <b>analyse</b> the data with statistics.</p><p class="small muted">This is exactly the example study used in VERA’s prototype screens.</p>'},
+ {t:'She asks an AI chatbot 🤖',art:`<div class="sc"><div class="row"><div class="big">👩‍🎓</div><div class="arrowx">➜</div><div class="big">🤖</div></div><div class="row"><div class="card2 good pop">Try 1: <b>“Yes! p = 0.03, significant”</b> 🎉</div></div><div class="row"><div class="card2 bad pop" style="animation-delay:.8s">Try 2 (same question): <b>“No effect, p = 0.07”</b> 😐</div></div><div class="bubble" style="animation-delay:1.4s">“Wait… which one is true?!”</div></div>`,
+  txt:'<p>Mona uploads her file to an AI chatbot and asks the question. It answers confidently: <b>“Yes, the programme worked.”</b></p><p>Out of curiosity she asks <b>the same question again</b>… and gets <b>“No effect.”</b></p><p>This really happens: a 2026 study ran the same request <b>480 times</b> and got different results, even with the AI set to be as consistent as possible.</p>'},
+ {t:'Why? Hidden choices 🙈',art:`<div class="sc"><div class="big">🤖💭</div><div class="row wrap"><div class="card2 hid">Drop the 3 duplicate students?</div><div class="card2 hid">What to do with 3 empty scores?</div><div class="card2 hid">Keep the 2 extreme scores?</div><div class="card2 hid">Which test? t-test? Welch? Mann–Whitney?</div><div class="card2 hid">Ignore a failed check?</div></div><div class="small muted">The AI decided all of these silently — and differently each time.</div></div>`,
+  txt:'<p>To analyse data you must make many <b>small choices</b>: what to do with empty cells, duplicates, extreme values, which test to use, what to do if a test’s conditions are not met.</p><p>The chatbot made all these choices <b>secretly</b> — and made <b>different</b> ones the second time. That’s why the answer changed.</p><p>Our own pilot study showed that with 150–250 people, these choices alone flip the answer in <b>almost half</b> of cases.</p>'},
+ {t:'VERA’s big idea 💡',art:`<div class="sc"><div class="row"><div class="card2" style="border-color:#4F7FE0">📏 <b>Written rule</b><br><small>decides it</small></div><div class="arrowx">or</div><div class="card2" style="border-color:#1E9A69">👩‍🎓 <b>Mona answers</b><br><small>and it’s saved</small></div></div><div class="row"><div class="card2 bad">❌ Nobody decided? → <b>VERA refuses to run</b></div></div></div>`,
+  txt:'<p>VERA has <b>one golden rule</b>: every choice that can change the result must be either</p><ol><li>decided by a <b>written statistics rule</b>, or</li><li><b>answered by Mona</b> herself (and her answer is saved).</li></ol><p>If neither happened, VERA <b>stops</b> instead of guessing. No more secret choices.</p>'},
+ {t:'Step 1: Mona describes her study 📝',art:`<div class="sc"><div class="formx"><div class="fx ai">Goal: compare 2 groups <small>✦ AI draft</small></div><div class="fx ai">Different students in each group <small>✦ AI draft</small></div><div class="fx ai">Anxiety = outcome <small>✦ AI draft</small></div><div class="fx ok">☑ I checked every field → <b>Confirm</b></div></div></div>`,
+  txt:'<p>The data file can’t say how the study was done, so VERA asks Mona to fill a short form (the <b>study declaration</b>): what she wants to compare, whether the groups are different people, which column is the outcome…</p><p>The AI <b>may fill a draft</b> to save time (purple = AI), but Mona must <b>check and confirm every field</b>. The AI never has the final word.</p>'},
+ {t:'Step 2: VERA checks the data 🔍',art:`<div class="sc"><div class="row"><div class="card2">📊 84 rows</div><div class="card2 warn">⚠ 3 students appear twice</div></div><div class="qbox">VERA: “You said each student appears once, but 3 appear twice. Remove duplicates / change design / stop?”<br><b>Mona:</b> “Remove them — they were typing mistakes.” ✅ saved</div></div>`,
+  txt:'<p>VERA measures the data automatically (no AI): number of rows, empty cells, duplicates, extreme values.</p><p>It finds a contradiction: Mona said each student appears once, but 3 appear twice. VERA <b>doesn’t fix it silently</b> — it asks Mona, and saves her answer and her reason.</p><p>Same for the other cleaning choices: a rule decides, or Mona decides. A new cleaned copy (version 1) is saved; the original is never changed.</p>'},
+ {t:'Step 3: rules pick tests, a gate blocks bad ones 🚧',art:`<div class="sc"><div class="card2 bad">⛔ Student’s t-test — <b>blocked</b><br><small>the two groups have different spread</small></div><div class="card2 good">✅ Welch’s t-test — allowed</div><div class="card2 good">✅ Mann–Whitney — allowed</div><div class="bubble">Mona picks <b>Welch</b> and writes why ✍️</div></div>`,
+  txt:'<p>VERA’s <b>rulebook</b> (not the AI) lists every test that fits Mona’s study.</p><p>Then the <b>assumption gate</b> checks each test’s conditions on the real data. Student’s t-test needs both groups to have similar spread — they don’t — so it is <b>blocked</b>.</p><p>Two tests remain allowed. VERA <b>doesn’t choose for her</b>: Mona picks one and writes a short reason.</p>'},
+ {t:'Step 4: run the maths & make a receipt 🧾',art:`<div class="sc"><div class="card2">🧮 Result: the sleep group had lower anxiety<br><small>t = 2.31, p = .024</small></div><div class="receipt pop"><b>🧾 Analysis record AR-012 (locked)</b><br>• study description ✔<br>• data version + fingerprint ✔<br>• every choice + who made it ✔<br>• checks + software versions ✔<br>• results ✔</div></div>`,
+  txt:'<p>Only when every choice is settled does VERA run the maths — with a normal, exact calculator, <b>not the AI</b>.</p><p>Then it creates the <b>analysis record</b>: a complete receipt of everything that happened. It is <b>locked</b> — nobody can edit it later.</p><p>The AI may now write a simple-language summary of the result, clearly labelled as AI-written. It can’t change any number.</p>'},
+ {t:'Step 5: someone else checks it ✅',art:`<div class="sc"><div class="row"><div class="big">🕵️</div><div class="arrowx">+</div><div class="card2">🧾 receipt</div><div class="arrowx">+</div><div class="card2">📄 original data</div></div><div class="arrowx">⬇ re-run</div><div class="card2 good pop">✅ <b>Agreement</b> — same result!</div></div>`,
+  txt:'<p>Later, an independent person (a <b>verifier</b>, e.g. a supervisor or reviewer) takes the receipt and the original data and presses re-run.</p><p>VERA repeats every step exactly. Same result → <b>Agreement</b>. Different → <b>Mismatch</b>. Data was changed → <b>Failure</b>.</p><p>Mona can now <b>prove</b> her result is honest and repeatable.</p>'},
+ {t:'Where is the AI then? ✦',art:`<div class="sc"><div class="row"><div class="card2 good">✅ <b>Draft</b> the form</div><div class="card2 good">✅ <b>Suggest</b> labels for interview text</div><div class="card2 good">✅ <b>Explain</b> results simply</div></div><div class="row"><div class="card2 bad">❌ choose the test</div><div class="card2 bad">❌ check conditions</div><div class="card2 bad">❌ do the maths</div><div class="card2 bad">❌ clean the data</div></div></div>`,
+  txt:'<p>VERA still uses AI — but only as an <b>assistant</b> with 3 jobs: <b>D</b>raft, <b>S</b>uggest, <b>E</b>xplain.</p><p>It is <b>locked out</b> of every decision that changes the result. That’s the key difference from normal AI tools.</p><p class="small muted">Why? Research shows AI is good at writing, but its statistical choices are unreliable and change between runs.</p>'},
+ {t:'How the team builds & proves it 🏗',art:`<div class="sc"><div class="row"><div class="card2">📅 This semester:<br><b>research + design</b></div><div class="arrowx">➜</div><div class="card2">🔁 Next semester:<br><b>8 sprints</b> build the website</div><div class="arrowx">➜</div><div class="card2">🧪 Then:<br><b>3 tests</b> to prove it</div></div></div>`,
+  txt:'<p><b>This semester</b>: research, requirements, diagrams and screen drawings (what you are presenting now).</p><p><b>Next semester</b>: build the real website in short 2-week cycles (<b>Scrum</b>), showing progress to Dr. Lobna each time.</p><p><b>Then prove it</b>: does VERA give the same answer every time? Does it catch hidden mistakes? Do students who use it make better analyses than with a normal chatbot?</p>'},
+ {t:'The whole project in 3 sentences 🎯',art:`<div class="sc"><div class="big">🎯</div></div>`,
+  txt:'<div class="box say"><span class="lbl">🎤 Memorise these 3 sentences</span><p>1. <b>Problem:</b> AI tools secretly make the choices that decide a statistical result, so answers change and can’t be checked.</p><p>2. <b>Solution:</b> VERA lets AI help, but every choice must come from a written rule or the researcher’s recorded answer — otherwise it doesn’t run.</p><p>3. <b>Result:</b> every analysis comes with a locked receipt that anyone can re-run to get the same answer.</p></div><p>Now go to the <b>Start</b> tab and continue through the tabs — every card has a 🟢 simple box, and every word with a dotted underline (like <span class="gl" data-g="0">statistics</span>) can be tapped for its meaning. There is also a <b>Dictionary</b> tab with every technical word.</p>'}];
+let stI=0;
+function storyRender(){const s=STORY[stI];$('#storyArt').innerHTML=s.art;$('#storyTxt').innerHTML=`<h2 style="font-size:24px;margin-bottom:8px">${s.t}</h2>${s.txt}`;
+  $('#storyN').textContent=`Scene ${stI+1} of ${STORY.length}`;$('#storyBar').style.width=((stI+1)/STORY.length*100)+'%';
+  $('#storyBox').style.animation='none';void $('#storyBox').offsetWidth;$('#storyBox').style.animation='fadeUp .45s';
+  $('#storyPrev').disabled=stI===0;$('#storyNext').textContent=stI===STORY.length-1?'Go to Start tab →':'Next scene ▶';}
+function storyStep(d){if(d>0&&stI===STORY.length-1){go('home');return;}stI=Math.max(0,Math.min(STORY.length-1,stI+d));storyRender();window.scrollTo({top:0,behavior:'smooth'});}
+storyRender();
+if(!store.get('v2seen',false)){store.set('v2seen',true);go('story');}
+refreshMarks();
 </script>
 </body></html>
