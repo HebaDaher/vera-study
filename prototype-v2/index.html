@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VERA Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a calm research tool. Navy header, a 5-step progress rail, one big question per screen, evidence on the side. */
+:root{
+  --navy:#14254A;
+  --blue:#5E8FCB;
+  --orange:#E5862A;
+  --pale:#EAF1FA;
+  --white:#FFFFFF;
+  --ink:#18223A;
+  --muted:#5A6679;
+  --line:#D3DCE9;
+  --bg:#F6F8FC;
+  --good:#23794A; --good-bg:#E5F3EA;
+  --warn:#9A5B0E; --warn-bg:#FCF0DF;
+  --bad:#A8332B; --bad-bg:#FBE8E6;
+  --display:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+/* header */
+.top{background:var(--navy);color:var(--white)}
+.top-in{max-width:1100px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:.04em}
+.brand small{font-family:var(--body);font-weight:400;font-size:13px;letter-spacing:0;opacity:.75}
+.nav{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+.nav button{background:transparent;border:0;color:#C9D6EC;padding:8px 14px;border-radius:8px;cursor:pointer;font-weight:500}
+.nav button[aria-current="page"]{background:rgba(255,255,255,.12);color:var(--white)}
+.nav .tag{font-size:11px;background:var(--orange);color:var(--navy);padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600;vertical-align:1px}
+.protobar{background:#FFF6EA;border-bottom:1px solid #F1D9B8;color:#6B4510;font-size:13.5px}
+.protobar div{max-width:1100px;margin:0 auto;padding:7px 20px}
+
+main{max-width:1100px;margin:0 auto;padding:22px 20px 60px}
+
+/* stepper */
+.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:0 0 22px;padding:0;list-style:none}
+.steps li button{width:100%;text-align:left;background:var(--white);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:center;min-height:56px}
+.steps li button:disabled{cursor:default;opacity:.55}
+.steps .n{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:600;font-size:14px;background:var(--pale);color:var(--navy)}
+.steps .l{font-size:13.5px;line-height:1.25;font-weight:500}
+.steps li.done .n{background:var(--navy);color:var(--white)}
+.steps li.cur button{border-color:var(--orange);box-shadow:0 0 0 2px rgba(229,134,42,.25)}
+.steps li.cur .n{background:var(--orange);color:var(--white)}
+
+/* cards & type */
+.card{background:var(--white);border:1px solid var(--line);border-radius:14px;padding:26px}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin:0 0 6px}
+h1.q{font-family:var(--display);font-weight:600;font-size:clamp(26px,3.4vw,38px);line-height:1.15;margin:0 0 8px;color:var(--navy);text-wrap:balance}
+h1.q.big{font-size:clamp(30px,4.4vw,48px)}
+.lead{color:var(--muted);margin:0 0 22px;max-width:65ch;font-size:17px}
+h2{font-family:var(--display);font-size:21px;margin:0 0 10px;color:var(--navy);text-wrap:balance}
+h3{font-size:15px;margin:0 0 6px}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.grid2{display:grid;grid-template-columns:1.1fr 1fr;gap:22px}
+.grid2.even{grid-template-columns:1fr 1fr}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.panel{border:1px solid var(--line);border-radius:12px;padding:18px;background:var(--white)}
+.panel.soft{background:var(--pale);border-color:#D5E2F3}
+
+/* role chips */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;vertical-align:2px}
+.chip.rule{background:var(--navy);color:var(--white)}
+.chip.you{background:var(--orange);color:var(--white)}
+.chip.ai{background:var(--white);color:#2F5F99;border:1px dashed var(--blue)}
+.chip.sim{background:#EEF0F4;color:#4B5567;border:1px dashed #9AA4B5}
+
+/* buttons */
+.btn{border:1px solid var(--navy);background:var(--white);color:var(--navy);border-radius:10px;padding:10px 18px;font-weight:600;cursor:pointer}
+.btn:hover{background:var(--pale)}
+.btn.primary{background:var(--navy);color:var(--white)}
+.btn.primary:hover{background:#1F3566}
+.btn.accent{background:var(--orange);border-color:var(--orange);color:var(--white)}
+.btn.accent:hover{background:#D1741B}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.lg{padding:14px 26px;font-size:17px}
+.link{background:none;border:0;color:#2F5F99;text-decoration:underline;cursor:pointer;padding:0;font-weight:500}
+.footer-nav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:22px;flex-wrap:wrap}
+.hint{font-size:14px;color:var(--muted)}
+
+/* forms */
+label.f{display:block;font-weight:600;font-size:14px;margin:0 0 5px}
+.in{width:100%;border:1px solid #BFCBDD;border-radius:9px;padding:9px 11px;background:var(--white)}
+textarea.in{min-height:70px;resize:vertical}
+.in.drafted{background:#F4F8FE;border-style:dashed;border-color:var(--blue)}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fieldtag{font-size:11.5px;font-weight:600;margin-left:6px}
+.fieldtag.ai{color:#2F5F99}
+.fieldtag.you{color:var(--orange)}
+.seg{display:inline-flex;background:var(--pale);border-radius:10px;padding:4px;gap:4px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;padding:8px 14px;border-radius:7px;cursor:pointer;font-weight:600;color:var(--navy)}
+.seg button[aria-pressed="true"]{background:var(--white);box-shadow:0 1px 3px rgba(20,37,74,.18)}
+
+/* dropzone */
+.drop{border:2px dashed #AFC2DD;border-radius:12px;padding:22px;text-align:center;background:#FBFCFE}
+.drop.over{border-color:var(--orange);background:#FFF8F0}
+.drop input{display:none}
+
+/* tables */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid #E7ECF3;white-space:nowrap}
+th{background:#F2F5FA;font-weight:600;font-size:13px;color:var(--muted)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:13.5px}
+tr:last-child td{border-bottom:0}
+td.miss{background:var(--warn-bg);color:var(--warn);font-weight:600;font-family:var(--body)}
+
+/* findings */
+.find{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.find li{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:#F7F9FC;border:1px solid #E6ECF4}
+.ic{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;color:var(--white);margin-top:1px}
+.ic.ok{background:var(--good)} .ic.warn{background:var(--orange)} .ic.bad{background:var(--bad)} .ic.info{background:var(--blue)}
+
+/* choice cards */
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.choice{border:2px solid var(--line);background:var(--white);border-radius:14px;padding:18px 18px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:4px}
+.choice:hover{border-color:var(--blue)}
+.choice[aria-pressed="true"]{border-color:var(--orange);background:#FFF8F0}
+.choice b{font-size:18px;color:var(--navy)}
+.choice span{font-size:14px;color:var(--muted)}
+
+/* status */
+.pill{display:inline-block;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;letter-spacing:.02em}
+.pill.ok{background:var(--good-bg);color:var(--good)}
+.pill.block{background:var(--bad-bg);color:var(--bad)}
+.pill.ask{background:var(--warn-bg);color:var(--warn)}
+.pill.neutral{background:#EEF1F6;color:var(--muted)}
+.callout{border-radius:12px;padding:14px 16px;border-left:5px solid}
+.callout.ok{background:var(--good-bg);border-color:var(--good)}
+.callout.bad{background:var(--bad-bg);border-color:var(--bad)}
+.callout.ask{background:var(--warn-bg);border-color:var(--orange)}
+.callout.info{background:var(--pale);border-color:var(--blue)}
+
+.decision{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--white)}
+.decision.blocked{border-color:#E7B5B0}
+.decision.eligible{border-color:#B6DCC4}
+.checks{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-direction:column;gap:8px}
+.checks li{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:14.5px}
+.rid{font-family:var(--mono);font-size:12px;color:var(--muted);background:#F1F4F9;padding:1px 6px;border-radius:4px;margin-right:6px}
+.mlist{display:flex;flex-direction:column;gap:10px}
+.mrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--white)}
+.mrow.sel{border-color:var(--orange);box-shadow:0 0 0 2px rgba(229,134,42,.2)}
+details summary{cursor:pointer;color:#2F5F99;font-weight:500;font-size:14px}
+
+/* summary grid */
+.sumgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.sumgrid .panel h3{display:flex;justify-content:space-between;align-items:center;gap:8px}
+dl.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:14.5px}
+dl.kv dt{color:var(--muted)}
+dl.kv dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.radio{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--white);cursor:pointer}
+.radio:has(input:checked){border-color:var(--orange);background:#FFF8F0}
+.radio input{margin-top:4px;accent-color:var(--orange)}
+.gate{font-family:var(--mono);font-size:13px;font-weight:500}
+
+/* results */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.stat{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--white)}
+.stat .k{font-size:12.5px;color:var(--muted);font-weight:500}
+.stat .v{font-family:var(--display);font-weight:600;font-size:24px;color:var(--navy);font-variant-numeric:tabular-nums}
+.stat .s{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.headline{font-family:var(--display);font-size:clamp(26px,3.6vw,40px);color:var(--navy);margin:0 0 4px;line-height:1.15;font-weight:600;text-wrap:balance}
+pre.json{background:#0F1B36;color:#DCE6F7;padding:14px;border-radius:10px;font-size:12.5px;max-height:320px;overflow:auto;font-family:var(--mono)}
+.verdict{display:flex;gap:14px;align-items:center;border-radius:14px;padding:16px 18px}
+.verdict.ok{background:var(--good-bg);border:1px solid #B6DCC4}
+.verdict.bad{background:var(--bad-bg);border:1px solid #E7B5B0}
+.verdict .big{font-family:var(--display);font-size:24px;font-weight:600}
+.filebox{border:1px solid var(--line);border-radius:12px;padding:14px;background:#FBFCFE;display:flex;flex-direction:column;gap:8px}
+.filebox input[type=file]{font-size:14px}
+.ok-t{color:var(--good);font-weight:600} .bad-t{color:var(--bad);font-weight:600}
+svg text{font-family:var(--body)}
+
+/* sensitivity */
+.synbanner{display:flex;gap:12px;align-items:center;background:var(--navy);color:var(--white);border-radius:12px;padding:12px 16px;margin-bottom:18px;flex-wrap:wrap}
+.synbanner b{background:var(--orange);color:var(--navy);padding:2px 8px;border-radius:6px;font-size:13px;letter-spacing:.05em}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0}
+.tile{border:1px solid var(--line);border-radius:12px;background:var(--white);padding:14px}
+.tile .v{font-family:var(--display);font-size:28px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums}
+.tile .k{font-size:13.5px;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--orange);height:28px}
+.ticks{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.sensout{border-radius:14px;padding:18px;border:2px solid}
+.sensout.stable{border-color:var(--good);background:var(--good-bg)}
+.sensout.uncertain{border-color:var(--orange);background:var(--warn-bg)}
+.sensout.reverses{border-color:var(--bad);background:var(--bad-bg)}
+.sensout .est{font-family:var(--display);font-size:clamp(28px,3.6vw,40px);font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.1}
+.legend3{display:flex;gap:8px;flex-wrap:wrap}
+.roles3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.roles3 .panel{font-size:14px}
+
+.running{display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:var(--pale)}
+.spin{width:20px;height:20px;border:3px solid #BFD0EA;border-top-color:var(--navy);border-radius:50%;animation:sp .8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--navy);color:var(--white);padding:10px 16px;border-radius:10px;font-size:14px;z-index:9;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+
+@media (max-width:820px){
+  .grid2,.grid2.even,.choices,.sumgrid,.roles3,.tiles{grid-template-columns:1fr}
+  .steps{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .steps .l{display:none}
+  .steps li button{justify-content:center;padding:8px}
+  .roles{grid-template-columns:1fr}
+  .card{padding:18px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="#0D1A38"/><path d="M8 9 L16 26 L24 9" fill="none" stroke="#F4EBD9" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="26.5" cy="24.5" r="3" fill="#E5862A"/></svg>
+      VERA <small>Verifiable research analysis</small>
+    </div>
+    <nav class="nav" aria-label="Main">
+      <button data-act="view" data-v="flow" id="nav-flow">Analysis workflow</button>
+      <button data-act="view" data-v="sens" id="nav-sens">Missing-exam demo<span class="tag">SYNTHETIC</span></button>
+    </nav>
+  </div>
+</header>
+<div class="protobar"><div><b>Prototype.</b> Everything runs in your browser. Parts marked <span class="chip ai">AI-assisted · simulated</span> or <span class="chip sim">Simulated backend</span> are stand-ins. The <span class="chip rule">Rule engine</span> checks methods; <span class="chip you">You decide</span> marks choices only the researcher makes.</div></div>
+<main id="app"></main>
+<div id="toast" class="toast" hidden></div>
+
+<script>
+// ==ENGINE==
+/* ---------- numerics ---------- */
+function lgamma(x){const c=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,tmp=x+5.5;tmp-=(x+0.5)*Math.log(tmp);let ser=1.000000000190015;for(let j=0;j<6;j++)ser+=c[j]/++y;return -tmp+Math.log(2.5066282746310005*ser/x);}
+function betacf(a,b,x){const MAXIT=200,EPS=3e-14,FPMIN=1e-300;let qab=a+b,qap=a+1,qam=a-1,c=1,d=1-qab*x/qap;if(Math.abs(d)<FPMIN)d=FPMIN;d=1/d;let h=d;for(let m=1;m<=MAXIT;m++){let m2=2*m,aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;const del=d*c;h*=del;if(Math.abs(del-1)<EPS)break;}return h;}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;const bt=Math.exp(lgamma(a+b)-lgamma(a)-lgamma(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b;}
+function tCDF(t,df){const x=df/(df+t*t);const p=0.5*betai(df/2,0.5,x);return t>0?1-p:p;}
+function tInv(p,df){let lo=-200,hi=200;for(let i=0;i<120;i++){const m=(lo+hi)/2;if(tCDF(m,df)<p)lo=m;else hi=m;}return (lo+hi)/2;}
+function erf(x){const s=Math.sign(x);x=Math.abs(x);const t=1/(1+0.3275911*x);const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function normCDF(z){return 0.5*(1+erf(z/Math.SQRT2));}
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+function sd(a){const m=mean(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)*(v-m),0)/(a.length-1));}
+function skew(a){const m=mean(a),n=a.length,s=Math.sqrt(a.reduce((t,v)=>t+(v-m)**2,0)/n);if(s===0)return 0;return a.reduce((t,v)=>t+((v-m)/s)**3,0)/n;}
+
+/* ---------- paired tests ---------- */
+function pairedT(pairs){
+  const n=pairs.length,d=pairs.map(p=>p.a-p.b),md=mean(d),s=sd(d),se=s/Math.sqrt(n),df=n-1,t=md/se;
+  const p=2*(1-tCDF(Math.abs(t),df)),tc=tInv(0.975,df);
+  return {method:'paired_t',n_pairs:n,mean_before:mean(pairs.map(p=>p.b)),mean_after:mean(pairs.map(p=>p.a)),mean_diff:md,sd_diff:s,ci_low:md-tc*se,ci_high:md+tc*se,t:t,df:df,p:p,dz:md/s};
+}
+
+/* ---------- missing-exam scenario values (synthetic; from Mahdi's sensitivity lab) ---------- */
+const SENS_VALUES=[[3.41,0.94,5.88],[3.02,0.55,5.49],[2.63,0.14,5.11],[2.24,-0.26,4.73],[1.84,-0.68,4.37],[1.45,-1.10,4.01],[1.06,-1.53,3.65],[0.67,-1.96,3.30],[0.28,-2.40,2.96],[-0.11,-2.84,2.62],[-0.50,-3.29,2.29],[-0.89,-3.75,1.96],[-1.28,-4.20,1.64],[-1.67,-4.67,1.32],[-2.07,-5.13,1.00],[-2.46,-5.60,0.69],[-2.85,-6.08,0.38],[-3.24,-6.55,0.08],[-3.63,-7.03,-0.23],[-4.02,-7.51,-0.53],[-4.41,-8.00,-0.82],[-4.80,-8.49,-1.12],[-5.19,-8.97,-1.41],[-5.58,-9.46,-1.70],[-5.98,-9.96,-1.99]];
+const SENS_OBS={est:3.44,lo:0.90,hi:5.99,n:90};
+function sensStatus(o){return o.lo>0?'stable':o.hi<0?'reverses':'uncertain';}
+// ==END ENGINE==
+
+/* ---------- sample data ---------- */
+const SAMPLE_NAME='training_scores.csv';
+const SAMPLE_CSV=`participant_id,score_before,score_after
+P01,62,70
+P02,55,61
+P03,71,69
+P04,48,57
+P05,66,69
+P06,59,68
+P07,74,78
+P08,52,62
+P09,63,67
+P10,58,63
+P11,69,79
+P12,45,54
+P13,61,66
+P14,57,
+P15,70,77
+P16,53,60
+P17,64,66
+P18,50,58
+P19,67,73
+P20,60,64
+`;
+const RULESET='VERA sample policy, rules R01\u2013R08';
+const METHODS={
+  paired_t:{name:'Paired t-test',design:'paired',short:'Compares each person\u2019s after score with their own before score.'},
+  welch:{name:'Welch\u2019s t-test',design:'independent',short:'Compares the averages of two separate groups of people.'},
+  ols:{name:'Linear regression',design:'predictor',short:'Models a score from one or more numeric predictors, with one independent observation per person.'}
+};
+const ELIGIBLE={paired:'paired_t',independent:'welch',predictor:'ols'};
+
+/* ---------- state ---------- */
+const S={view:'flow',step:1,maxStep:1,data:null,roles:{id:'',before:'',after:''},details:{question:'',population:''},mode:'manual',ai:{},
+  design:null,m3:'check',pick:'welch',reviewed:false,draftOk:false,checked:null,method:null,missing:null,tick:false,running:false,result:null,record:null,recordText:'',hash:'',
+  tab5:'result',ver:{csv:null,csvName:'',rec:null,recName:'',out:null},sens:{pop:'all',shift:0}};
+let CURVE=null,OBS=null;
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const MINUS='−';
+const fx=(x,d=1)=>(x<0?MINUS:'')+Math.abs(x).toFixed(d);
+const sg=(x,d=1)=>(x>0?'+':x<0?MINUS:'')+Math.abs(x).toFixed(d);
+const fp=p=>p<0.001?'p < .001':'p = '+p.toFixed(3).replace(/^0/,'');
+const num=v=>{if(v===undefined||v===null)return null;const t=String(v).trim();if(t===''||/^(na|n\/a|null|nan|-)$/i.test(t))return null;const n=Number(t);return isFinite(n)?n:NaN;};
+function toast(msg){const t=$('#toast');t.textContent=msg;t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,2600);}
+
+function parseCSV(text){
+  const rows=[];let cur=[''],q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){cur[cur.length-1]+='"';i++;}else q=false;}else cur[cur.length-1]+=c;}
+    else if(c==='"')q=true;else if(c===',')cur.push('');else if(c==='\n'){rows.push(cur);cur=[''];}else if(c!=='\r')cur[cur.length-1]+=c;}
+  if(cur.length>1||cur[0]!=='')rows.push(cur);
+  const clean=rows.filter(r=>r.some(c=>c.trim()!==''));
+  if(clean.length<2)throw new Error('The file needs a header row and at least one data row.');
+  const headers=clean[0].map(h=>h.trim());
+  return {headers,rows:clean.slice(1).map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]??'').trim()])))};
+}
+function guessRoles(h){
+  const f=re=>h.find(x=>re.test(x))||'';
+  let id=f(/(^id$|_id$|participant|student|subject|^id)/i),b=f(/(before|pre|baseline|t1)/i),a=f(/(after|post|t2)/i);
+  const rest=h.filter(x=>x!==id&&x!==b&&x!==a);
+  if(!id)id=rest.shift()||'';if(!b)b=rest.shift()||'';if(!a)a=rest.shift()||'';return {id,before:b,after:a};
+}
+async function fingerprint(text){
+  try{const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));return 'sha256:'+[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');}
+  catch(e){let h=0x811c9dc5;for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}return 'fnv32:'+h.toString(16);}
+}
+
+/* ---------- profile & rule engine ---------- */
+function profileOf(data,roles){
+  const ids=[],seen=new Set(),dups=new Set(),missB=[],missA=[],bad=[],pairs=[];let mn=Infinity,mx=-Infinity;
+  data.rows.forEach((r,i)=>{const id=r[roles.id]||('row '+(i+1));ids.push(id);if(seen.has(id))dups.add(id);seen.add(id);
+    const b=num(r[roles.before]),a=num(r[roles.after]);
+    if(Number.isNaN(b)||Number.isNaN(a))bad.push(id);
+    if(b===null)missB.push(id);if(a===null)missA.push(id);
+    [b,a].forEach(v=>{if(v!==null&&!Number.isNaN(v)){mn=Math.min(mn,v);mx=Math.max(mx,v);}});
+    if(b!==null&&a!==null&&!Number.isNaN(b)&&!Number.isNaN(a))pairs.push({id,b,a});});
+  const incomplete=data.rows.map((r,i)=>ids[i]).filter(id=>!pairs.find(p=>p.id===id));
+  return {n:data.rows.length,unique:seen.size,dups:[...dups],missB,missA,bad,pairs,incomplete,min:mn,max:mx,
+    groupCol:data.headers.find(h=>/^(group|condition|arm|cohort)$/i.test(h))||null};
+}
+function profile(){return profileOf(S.data,S.roles);}
+
+function evaluate(mid){
+  const P=profile(),m=METHODS[mid],checks=[],np=P.pairs.length,elig=ELIGIBLE[S.design]||'paired_t';
+  checks.push({rule:'R01',label:'Observation structure confirmed',outcome:'pass',detail:'Study declaration: the same people were measured twice (confirmed by you).'});
+  if(P.incomplete.length||P.bad.length){
+    const done=S.missing==='exclude',ids=P.incomplete.join(', ');
+    checks.push({rule:'R04',label:'Missing or invalid numbers',outcome:done?'pass':'ask',
+      detail:done?'Resolved by you: '+ids+' left out, so '+np+' complete pairs remain.':ids+' '+(P.incomplete.length>1?'have':'has')+' a missing score. You\u2019ll decide how to handle '+(P.incomplete.length>1?'them':'it')+' in Step 4.'});
+  }else checks.push({rule:'R04',label:'Missing or invalid numbers',outcome:'pass',detail:'All required numeric values are present.'});
+  checks.push({rule:'R02',label:'Matched pairs',outcome:(P.dups.length||np<2)?'fail':'pass',
+    detail:P.dups.length?'Some IDs appear more than once ('+P.dups.join(', ')+'). A paired comparison needs one before and one after score per person.':np+' participants have one score before and one after training.'});
+  let alt=null;
+  if(m.design===S.design){
+    checks.push({rule:'R05',label:'Method is eligible for the confirmed design',outcome:'pass',detail:'Candidate method: '+m.name+'.'});
+    checks.push({rule:'R07',label:'You reviewed the method requirements',outcome:S.reviewed?'pass':'ask',
+      detail:S.reviewed?'You confirmed the requirements a CSV cannot show: participants did not affect each other\u2019s scores, and the score changes have no extreme outliers.':'A CSV cannot show whether participants affected each other\u2019s scores, or whether the changes contain extreme outliers. Review and confirm below.'});
+    const d=P.pairs.map(p=>p.a-p.b),ok=np>=2&&sd(d)>0;
+    checks.push({rule:'R08',label:'The calculation is defined',outcome:ok?'pass':'fail',detail:ok?'With '+np+' pairs and varied score changes, the paired t statistic can be computed.':'The score changes do not vary, so the t statistic cannot be computed.'});
+  }else{
+    const why=mid==='welch'
+      ?'Welch\u2019s t-test compares two separate groups of people. You confirmed the same people were measured twice, so it would treat each person\u2019s two scores as unrelated and ignore the pairing.'
+      :'Linear regression here would treat all '+(np*2)+' scores as independent observations. You confirmed each person was measured twice, so their two scores are linked, and your question is about each person\u2019s change.';
+    checks.push({rule:'R05',label:'Method is eligible for the confirmed design',outcome:'fail',detail:why+' The eligible candidate is '+METHODS[elig].name+'.'});
+    alt=elig;
+  }
+  const status=checks.some(c=>c.outcome==='fail')?'blocked':'eligible';
+  const asks=checks.filter(c=>c.outcome==='ask').length;
+  let explain;
+  if(status==='blocked'&&alt)explain=m.name+' conflicts with the confirmed setup: your study measured the same people twice. The eligible candidate is '+METHODS[alt].name+'.';
+  else if(status==='blocked')explain=m.name+' is blocked because one of its requirements is not met by your data.';
+  else explain='The confirmed setup allows '+m.name+'. It compares each participant with themselves'+(asks?'. '+asks+' open question'+(asks>1?'s':'')+' remain'+(asks>1?'':'s')+'.':'.');
+  return {mid,status,checks,alt,asks,explain};
+}
+
+function runAnalysis(){return pairedT(profile().pairs);}
+const RESULT_KEYS={paired_t:[['n_pairs','Complete pairs',0],['mean_before','Mean before',3],['mean_after','Mean after',3],['mean_diff','Mean change',3],['ci_low','95% CI lower',3],['ci_high','95% CI upper',3],['t','t statistic',3],['df','Degrees of freedom',0],['p','p-value',4],['dz','Effect size dz',3]]};
+const r6=v=>Math.round(v*1e6)/1e6;
+
+async function buildRecord(res){
+  const P=profile(),ev=evaluate(S.method);
+  return {
+    vera_record:'0.1-prototype',
+    created_at:new Date().toISOString(),
+    dataset:{file_name:S.data.name,fingerprint:S.hash,rows:P.n,columns:S.data.headers,original_preserved:true},
+    study_declaration:{question:S.details.question,population:S.details.population,column_roles:{...S.roles},
+      design:'paired',design_question:'Were the same participants measured before and after training?',design_answer:'Yes',decided_by:'researcher',
+      draft_source:Object.keys(S.ai).length?'AI draft (simulated), checked and confirmed by researcher':'entered by researcher'},
+    method_requirements_reviewed:{by:'researcher',rule:'R07'},
+    data_findings:{unique_ids:P.unique,duplicate_ids:P.dups,missing_before:P.missB,missing_after:P.missA,score_range:[P.min,P.max]},
+    preparation:P.incomplete.length?[{step:'exclude_incomplete_pairs',ids:P.incomplete,decided_by:'researcher',reason:'Paired methods need both scores'}]:[],
+    method:{id:S.method,name:METHODS[S.method].name,alpha:0.05,alternative:'two-sided',chosen_by:'researcher',route:S.m3==='check'?'checked a method I want to use':'chose from eligible methods'},
+    rule_checks:ev.checks.map(c=>({rule:c.rule,check:c.label,outcome:c.outcome,detail:c.detail})),
+    gate:'authorize',approved_by:'researcher',approved_at:new Date().toISOString(),
+    policy_version:RULESET,software:'vera-prototype-web 0.1 (browser)',
+    results:Object.fromEntries(RESULT_KEYS[S.method].map(([k])=>[k,r6(res[k])]))
+  };
+}
+
+/* ---------- replay ---------- */
+async function replay(csvText,recText){
+  let rec,data;
+  try{rec=JSON.parse(recText);}catch(e){return {error:'The decision record is not valid JSON. Load the .json file VERA produced.'};}
+  try{data=parseCSV(csvText);}catch(e){return {error:'The data file could not be read: '+e.message};}
+  if(!rec.study_declaration||!rec.method||!rec.results)return {error:'This JSON file is not a VERA decision record.'};
+  const fpNow=await fingerprint(csvText),hashMatch=fpNow===rec.dataset.fingerprint;
+  const roles=rec.study_declaration.column_roles;
+  if(!data.headers.includes(roles.before)||!data.headers.includes(roles.after))return {error:'The data file does not have the columns named in the record ('+roles.before+', '+roles.after+').'};
+  const P=profileOf(data,roles),recEx=(rec.preparation[0]||{}).ids||[];
+  const prepMatch=JSON.stringify(P.incomplete)===JSON.stringify(recEx);
+  if(!RESULT_KEYS[rec.method.id])return {error:'This prototype can only replay the paired t-test.'};
+  const res=pairedT(P.pairs);
+  const rows=RESULT_KEYS[rec.method.id].map(([k,label,d])=>{const a=rec.results[k],b=r6(res[k]);return {label,rec:a,rep:b,d,match:Math.abs(a-b)<1e-6};});
+  return {hashMatch,fpNow,fpRec:rec.dataset.fingerprint,prepMatch,recEx,nowEx:P.incomplete,rows,all:rows.every(r=>r.match),method:rec.method.name,rule:rec.policy_version};
+}
+
+/* ---------- downloads ---------- */
+let DL=null;
+(async()=>{try{if(window.claude&&window.claude.use)DL=await window.claude.use('downloads');}catch(e){DL=null;}})();
+async function save(filename,text){
+  if(DL){try{await DL.save({filename,data:text});toast('Saved '+filename);return;}catch(e){if(e&&e.code==='declined'){toast('Download cancelled');return;}}}
+  try{const u=URL.createObjectURL(new Blob([text],{type:'text/plain'}));const l=document.createElement('a');l.href=u;l.download=filename;document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);if(!window.claude){toast('Saved '+filename);return;}}catch(e){}
+  try{await navigator.clipboard.writeText(text);toast('Downloads are not available here, so the file contents were copied to your clipboard.');}
+  catch(e){toast('Download not available in this view.');}
+}
+
+/* ---------- render: shell ---------- */
+const STEPS=['Upload and describe','Confirm design','Methods and checks','Approve and run','Results and replay'];
+function render(){
+  $('#nav-flow').setAttribute('aria-current',S.view==='flow'?'page':'false');
+  $('#nav-sens').setAttribute('aria-current',S.view==='sens'?'page':'false');
+  const app=$('#app');
+  if(S.view==='sens'){app.innerHTML=renderSens();drawSens();return;}
+  const stepper='<ol class="steps" aria-label="Progress">'+STEPS.map((l,i)=>{const n=i+1,cls=n===S.step?'cur':n<S.maxStep||(n<S.step)?'done':'';
+    return `<li class="${cls}"><button data-act="goto" data-n="${n}" ${n>S.maxStep?'disabled':''} ${n===S.step?'aria-current="step"':''}><span class="n">${n<S.step?'✓':n}</span><span class="l">${l}</span></button></li>`;}).join('')+'</ol>';
+  const body=[null,step1,step2,step3,step4,step5][S.step]();
+  app.innerHTML=stepper+body;
+  if(S.step===5&&S.tab5==='result')drawSlope();
+}
+function go(n){S.step=n;S.maxStep=Math.max(S.maxStep,n);render();window.scrollTo({top:0,behavior:'smooth'});}
+
+/* ---------- step 1 ---------- */
+function step1(){
+  const d=S.data;
+  let left;
+  if(!d){
+    left=`<div class="drop" id="drop"><p style="font-weight:600;margin-bottom:4px">Drop a CSV file here</p><p class="small muted">One row per participant. Example columns: participant_id, score_before, score_after.</p>
+      <div class="row" style="justify-content:center;margin-top:12px"><label class="btn" for="file1">Choose CSV file</label><input type="file" id="file1" accept=".csv,text/csv"><button class="btn primary" data-act="sample">Use sample data</button></div>
+      <p class="small muted" style="margin-top:12px">Sample: 20 participants, exam scores before and after a training workshop.</p></div>`;
+  }else{
+    const P=profile(),cols=d.headers;
+    left=`<div class="row" style="justify-content:space-between"><div><b>${esc(d.name)}</b> <span class="muted small">· ${d.rows.length} rows · ${cols.length} columns</span></div><button class="link" data-act="clear">Use a different file</button></div>
+    <div class="tw" style="margin-top:10px;max-height:330px;overflow:auto"><table><thead><tr>${cols.map(c=>`<th class="${c===S.roles.id?'':'num'}">${esc(c)}</th>`).join('')}</tr></thead><tbody>
+    ${d.rows.slice(0,20).map(r=>'<tr>'+cols.map(c=>{const v=r[c];return v===''?'<td class="miss">missing</td>':`<td class="${c===S.roles.id?'':'num'}">${esc(v)}</td>`;}).join('')+'</tr>').join('')}</tbody></table></div>
+    ${d.rows.length>20?`<p class="small muted">Showing 20 of ${d.rows.length} rows.</p>`:''}
+    <p class="small muted" style="margin-top:8px">Your original file is kept unchanged. Any preparation step creates a new version linked to it.</p>`;
+  }
+  const opts=c=>'<option value="">Choose…</option>'+(d?d.headers.map(h=>`<option ${h===c?'selected':''}>${esc(h)}</option>`).join(''):'');
+  const tag=k=>S.ai[k]==='ai'?'<span class="fieldtag ai">AI draft · check this</span>':S.ai[k]==='you'?'<span class="fieldtag you">Corrected by you</span>':'';
+  const cls=k=>S.ai[k]==='ai'?'in drafted':'in';
+  const right=`<div class="row" style="justify-content:space-between;margin-bottom:12px"><h2 style="margin:0">About the study</h2>
+    <div class="seg" role="group" aria-label="How to fill in"><button data-act="mode" data-m="manual" aria-pressed="${S.mode==='manual'}">I’ll write it</button><button data-act="mode" data-m="ai" aria-pressed="${S.mode==='ai'}" ${d?'':'disabled'}>Draft it for me</button></div></div>
+    ${S.mode==='ai'?'<div class="callout info small" style="margin-bottom:12px"><span class="chip ai">AI-assisted · simulated</span> A draft was written from your column names. Check each field and correct anything wrong. Nothing is used until you continue.</div>':''}
+    <div class="stack">
+      <div><label class="f" for="q">What is your research question? ${tag('question')}</label><textarea class="${cls('question')}" id="q" data-field="question" placeholder="e.g. Did exam scores change after the training?">${esc(S.details.question)}</textarea></div>
+      <div><label class="f" for="pop">Who took part? ${tag('population')}</label><input class="${cls('population')}" id="pop" data-field="population" placeholder="e.g. Students in one training cohort" value="${esc(S.details.population)}"></div>
+      <div><span class="f" style="display:block;font-weight:600;font-size:14px;margin-bottom:5px">Which column is which? ${tag('roles')}</span>
+        <div class="roles">
+          <div><label class="small muted" for="r-id">Participant ID</label><select class="${cls('roles')}" id="r-id" data-role="id" ${d?'':'disabled'}>${opts(S.roles.id)}</select></div>
+          <div><label class="small muted" for="r-b">Score before</label><select class="${cls('roles')}" id="r-b" data-role="before" ${d?'':'disabled'}>${opts(S.roles.before)}</select></div>
+          <div><label class="small muted" for="r-a">Score after</label><select class="${cls('roles')}" id="r-a" data-role="after" ${d?'':'disabled'}>${opts(S.roles.after)}</select></div>
+        </div></div>
+      ${S.mode==='ai'?(S.draftOk
+        ?'<div class="callout ok"><div class="row" style="justify-content:space-between"><b>\u2713 Draft confirmed by you</b><span class="chip you">You decide</span></div><span class="small">VERA will use these details. <button class="link" data-act="undraft">Undo</button></span></div>'
+        :'<div class="callout ask"><div class="row" style="justify-content:space-between"><b>Is this draft correct?</b><span class="chip you">You decide</span></div><p class="small" style="margin:6px 0 10px">Fix any field above first. VERA won\u2019t use the draft until you confirm it.</p><button class="btn accent" data-act="okdraft">Yes, the draft is correct</button></div>'):''}
+    </div>`;
+  return `<section class="card"><p class="eyebrow">Step 1 of 5</p><h1 class="q">Upload your data and describe your study</h1>
+    <p class="lead">Start with your file. Then tell VERA, in your own words, what you want to find out.</p>
+    <div class="grid2"><div class="panel"><h2>Your data</h2>${left}</div><div class="panel">${right}</div></div>
+    <div class="footer-nav"><span class="hint" id="s1hint">${s1hint()}</span><button class="btn primary lg" data-act="next1" id="next1" ${s1ok()?'':'disabled'}>Continue</button></div></section>`;
+}
+function s1ok(){const r=S.roles;return !!(S.data&&S.details.question.trim()&&r.id&&r.before&&r.after&&new Set([r.id,r.before,r.after]).size===3&&(S.mode!=='ai'||S.draftOk));}
+function s1hint(){if(!S.data)return 'Upload a CSV or use the sample data.';if(!S.details.question.trim())return 'Add your research question to continue.';const r=S.roles;if(!(r.id&&r.before&&r.after))return 'Match each column to its role.';if(new Set([r.id,r.before,r.after]).size<3)return 'Each role needs a different column.';if(S.mode==='ai'&&!S.draftOk)return 'Check the AI draft and confirm it to continue.';return 'Next, VERA will ask how your study was designed.';}
+function refresh1(){const b=$('#next1');if(b)b.disabled=!s1ok();const h=$('#s1hint');if(h)h.textContent=s1hint();}
+function loadData(name,text){
+  try{const p=parseCSV(text);S.data={name,text,headers:p.headers,rows:p.rows};S.roles=guessRoles(p.headers);}
+  catch(e){toast(e.message);return;}
+  Object.assign(S,{design:null,checked:null,method:null,missing:null,tick:false,reviewed:false,draftOk:false,result:null,record:null,maxStep:1,ai:{},mode:'manual'});
+  render();
+}
+function aiDraft(){
+  S.mode='ai';S.roles=guessRoles(S.data.headers);
+  S.details.question='Did participants’ exam scores change after the training workshop?';
+  S.details.population='Participants in one training workshop cohort';
+  S.ai={question:'ai',population:'ai',roles:'ai'};S.draftOk=false;render();
+}
+
+/* ---------- step 2 ---------- */
+function step2(){
+  const P=profile(),f=[];
+  f.push(P.dups.length?['warn',`${P.dups.length} duplicate participant ID${P.dups.length>1?'s':''} (${esc(P.dups.join(', '))}). Each person should appear once.`]:['ok',`${P.unique} participant IDs, each appearing once.`]);
+  f.push(['ok',`Each row holds a <b>${esc(S.roles.before)}</b> and a <b>${esc(S.roles.after)}</b> score for the same ID.`]);
+  f.push(P.groupCol?['info',`There is a group column (<b>${esc(P.groupCol)}</b>).`]:['ok','No group column, so there is no sign of two separate groups.']);
+  if(P.incomplete.length)f.push(['warn',`${P.incomplete.length} missing score${P.incomplete.length>1?'s':''}: <b>${esc(P.incomplete.join(', '))}</b>. You’ll decide how to handle ${P.incomplete.length>1?'them':'it'} in Step 4.`]);
+  else f.push(['ok','No missing scores.']);
+  if(P.bad.length)f.push(['bad',`Non-numeric scores for ${esc(P.bad.join(', '))}. These rows are treated as missing.`]);
+  if(isFinite(P.min))f.push(['ok',`Scores range from ${P.min} to ${P.max}.`]);
+  const icon={ok:'✓',warn:'!',bad:'×',info:'i'};
+  let out='';
+  if(S.design==='paired')out=`<div class="callout ok"><b>Your answer matches the data.</b> <span class="chip you">You decide</span><br>VERA will only allow methods for paired data, where each person is compared with themselves.</div>`;
+  else if(S.design==='independent')out=`<div class="callout bad"><b>Your answer does not match the data.</b><br>Your file has one row per person with both scores and no group column. A two-groups design can’t be checked against this file. Review your answer, or go back and upload data with a group column.</div>`;
+  return `<section class="card"><p class="eyebrow">Step 2 of 5 · Study design</p>
+    <h1 class="q big">Were the same participants measured before and after training?</h1>
+    <p class="lead">This decides which methods are valid. The same spreadsheet can mean two scores per person or two separate groups, and these need different analyses.</p>
+    <div class="grid2"><div class="stack">
+      <div class="choices">
+        <button class="choice" data-act="design" data-d="paired" aria-pressed="${S.design==='paired'}"><b>Yes, the same people</b><span>Each person was tested twice. (Paired design)</span></button>
+        <button class="choice" data-act="design" data-d="independent" aria-pressed="${S.design==='independent'}"><b>No, different people</b><span>Before and after scores came from two separate groups. (Independent groups)</span></button>
+      </div>${out}</div>
+      <div class="panel soft"><div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="margin:0">What VERA found in your data</h2><span class="chip rule">Rule engine</span></div>
+      <ul class="find">${f.map(([k,t])=>`<li><span class="ic ${k}">${icon[k]}</span><span>${t}</span></li>`).join('')}</ul></div>
+    </div>
+    <div class="footer-nav"><button class="btn" data-act="goto" data-n="1">Back</button><button class="btn primary lg" data-act="next2" ${S.design==='paired'?'':'disabled'}>Confirm design</button></div></section>`;
+}
+
+/* ---------- step 3 ---------- */
+function decisionCard(ev,showUse){
+  const m=METHODS[ev.mid],ic={pass:['ok','✓'],fail:['bad','×'],ask:['warn','?']};
+  return `<div class="decision ${ev.status}">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">${m.name}</h2><span class="pill ${ev.status==='blocked'?'block':'ok'}">${ev.status==='blocked'?'BLOCKED':'ELIGIBLE'}</span></div>
+    <p style="margin:10px 0 4px;font-size:17px">${esc(ev.explain)}</p>
+    <p class="small muted" style="margin:0"><span class="chip rule">Rule engine</span> made the decision · <span class="chip ai">AI-assisted · simulated</span> helped with the wording</p>
+    <ul class="checks">${ev.checks.map(c=>`<li><span class="ic ${ic[c.outcome][0]}">${ic[c.outcome][1]}</span><div><span class="rid">${c.rule}</span><b>${esc(c.label)}</b><br><span class="muted">${esc(c.detail)}</span></div></li>`).join('')}</ul>
+    ${ev.status==='blocked'&&ev.alt?`<div class="callout ok" style="margin-top:14px"><div class="row" style="justify-content:space-between"><span><b>Supported alternative:</b> ${METHODS[ev.alt].name}. ${METHODS[ev.alt].short}</span><button class="btn primary" data-act="use" data-m="${ev.alt}">Use ${METHODS[ev.alt].name}</button></div></div>`:''}
+    ${ev.status==='eligible'&&showUse?`<div class="row" style="margin-top:14px">${S.method===ev.mid?'<span class="pill ok">✓ Selected for your plan</span>':`<button class="btn primary" data-act="use" data-m="${ev.mid}">Use this method</button>`}</div>`:''}
+  </div>`;
+}
+function reviewPanel(){
+  if(!S.method)return '';
+  return `<div class="callout ${S.reviewed?'ok':'ask'}" style="margin-top:16px"><div class="row" style="justify-content:space-between"><b><span class="rid">R07</span>Review the requirements for ${METHODS[S.method].name}</b><span class="chip you">You decide</span></div>
+    <p class="small" style="margin:6px 0 8px">Your file can’t show these. Only you know your study, so please confirm:</p>
+    <ul class="small" style="margin:0 0 10px;padding-left:20px"><li>Each participant’s scores did not affect anyone else’s (for example, no shared answers).</li><li>No score change is an extreme outlier caused by an error. With ${profile().pairs.length} pairs, mild non-normality is acceptable.</li></ul>
+    <label class="radio" style="background:transparent"><input type="checkbox" id="reviewed" ${S.reviewed?'checked':''}><span><b>I reviewed the study and method requirements</b></span></label></div>`;
+}
+function step3(){
+  let body;
+  if(S.m3==='check'){
+    body=`<div class="row" style="align-items:flex-end;margin-bottom:16px"><div style="flex:1;min-width:240px"><label class="f" for="pick">Which method do you want to use?</label>
+      <select class="in" id="pick"><option value="eligible" ${S.pick==='eligible'?'selected':''}>Use the eligible method</option>${Object.entries(METHODS).map(([k,m])=>`<option value="${k}" ${k===S.pick?'selected':''}>${m.name}</option>`).join('')}</select></div>
+      <button class="btn primary" data-act="check">Check this method</button></div>
+      ${S.checked?(S.pick==='eligible'?'<div class="callout info small" style="margin-bottom:10px"><span class="chip rule">Rule engine</span> picked the method that fits your confirmed design.</div>':'')+decisionCard(evaluate(S.checked),true):'<div class="callout info">Pick a method and VERA will check it against your confirmed design and your data.</div>'}`;
+  }else{
+    const evs=Object.keys(METHODS).map(evaluate).sort((a,b)=>(a.status==='eligible'?0:1)-(b.status==='eligible'?0:1));
+    body='<div class="mlist">'+evs.map(ev=>`<div class="mrow ${S.method===ev.mid?'sel':''}"><div><div class="row"><b style="font-size:17px">${METHODS[ev.mid].name}</b><span class="pill ${ev.status==='blocked'?'block':'ok'}">${ev.status==='blocked'?'BLOCKED':'ELIGIBLE'}</span></div>
+      <p class="muted small" style="margin:4px 0 6px">${esc(ev.explain)}</p>
+      <details><summary>See the ${ev.checks.length} rule checks</summary><ul class="checks">${ev.checks.map(c=>`<li><span class="ic ${c.outcome==='pass'?'ok':c.outcome==='fail'?'bad':'warn'}">${c.outcome==='pass'?'✓':c.outcome==='fail'?'×':'?'}</span><div><span class="rid">${c.rule}</span><b>${esc(c.label)}</b><br><span class="muted">${esc(c.detail)}</span></div></li>`).join('')}</ul></details></div>
+      <div>${ev.status==='eligible'?(S.method===ev.mid?'<span class="pill ok">✓ Selected</span>':`<button class="btn primary" data-act="use" data-m="${ev.mid}">Use</button>`):`<button class="btn" disabled>Not allowed</button>`}</div></div>`).join('')+'</div>';
+  }
+  const ready=S.method&&S.reviewed;
+  return `<section class="card"><p class="eyebrow">Step 3 of 5 · Methods and checks</p>
+    <h1 class="q">Which statistical method should you use?</h1>
+    <p class="lead">Check a method you have in mind, or let VERA list the ones your study allows. Both apply the same rules: ${RULESET}.</p>
+    <div class="seg" role="group" aria-label="Method route" style="margin-bottom:18px"><button data-act="m3" data-m="check" aria-pressed="${S.m3==='check'}">Check a method I want to use</button><button data-act="m3" data-m="list" aria-pressed="${S.m3==='list'}">Show eligible methods</button></div>
+    ${body}${reviewPanel()}
+    <div class="footer-nav"><button class="btn" data-act="goto" data-n="2">Back</button><div class="row"><span class="hint">${!S.method?'Select an eligible method to continue.':!S.reviewed?'Confirm you reviewed the requirements (R07).':'Selected: <b>'+METHODS[S.method].name+'</b>'}</span><button class="btn primary lg" data-act="next3" ${ready?'':'disabled'}>Continue</button></div></div></section>`;
+}
+
+/* ---------- step 4 ---------- */
+function step4(){
+  const P=profile(),ev=evaluate(S.method),open=P.incomplete.length&&S.missing!=='exclude';
+  const ready=!open&&S.tick;
+  const gate=open?'<span class="pill ask">ASK</span> <span class="gate">1 open question to resolve</span>':ready?'<span class="pill ok">AUTHORIZE</span> <span class="gate">plan is ready to run</span>':'<span class="pill neutral">WAITING</span> <span class="gate">needs your approval</span>';
+  const q=P.incomplete.length?`<div class="callout ${S.missing==='exclude'?'ok':'ask'}"><div class="row" style="justify-content:space-between"><b>${S.missing==='exclude'?'Resolved':'Open question'}</b><span class="chip you">You decide</span></div>
+    <p style="margin:8px 0 12px;font-size:17px"><b>${esc(P.incomplete.join(', '))}</b> ${P.incomplete.length>1?'have':'has'} a before score but no after score. How should VERA handle ${P.incomplete.length>1?'them':'this participant'}?</p>
+    <div class="stack" style="gap:8px">
+      <label class="radio"><input type="radio" name="miss" value="exclude" ${S.missing==='exclude'?'checked':''}><span><b>Leave ${P.incomplete.length>1?'them':'them'} out and analyse the ${P.pairs.length} complete pairs</b><br><span class="small muted">Supported: paired methods need both scores. The record will list who was left out.</span></span></label>
+      <label class="radio"><input type="radio" name="miss" value="stop" ${S.missing==='stop'?'checked':''}><span><b>Stop. I’ll find the missing score and upload again</b><br><span class="small muted">The plan cannot run until the data changes.</span></span></label>
+    </div>${S.missing==='stop'?'<p class="small" style="margin-top:10px"><button class="link" data-act="goto" data-n="1">Go back to Step 1</button> to upload the corrected file.</p>':''}</div>`
+    :'<div class="callout ok"><b>No open questions.</b> Every participant has both scores.</div>';
+  const running=S.running?'<div class="running"><span class="spin"></span><span>Running the approved plan on the checked dataset version… <span class="chip sim">Simulated backend</span></span></div>':'';
+  return `<section class="card"><p class="eyebrow">Step 4 of 5 · Approve and run</p>
+    <h1 class="q">Is this the analysis you want to run?</h1>
+    <p class="lead">Review the plan. Nothing runs until you approve it.</p>
+    <div class="sumgrid">
+      <div class="panel"><h3>Dataset <span class="chip rule">Checked</span></h3><dl class="kv"><dt>File</dt><dd>${esc(S.data.name)}</dd><dt>Rows</dt><dd>${P.n} participants</dd><dt>Columns</dt><dd>${esc(S.roles.id)}, ${esc(S.roles.before)}, ${esc(S.roles.after)}</dd><dt>Design</dt><dd>Paired (confirmed by you)</dd></dl></div>
+      <div class="panel"><h3>Preparation <span class="chip you">Your choice</span></h3><dl class="kv"><dt>Missing scores</dt><dd>${P.incomplete.length?(S.missing==='exclude'?'Leave out '+esc(P.incomplete.join(', ')):'<span style="color:var(--warn)">Not decided yet</span>'):'None'}</dd><dt>Analysed</dt><dd>${P.pairs.length} complete pairs</dd><dt>Original file</dt><dd>Kept unchanged</dd></dl></div>
+      <div class="panel"><h3>Method <span class="chip you">Your choice</span></h3><dl class="kv"><dt>Test</dt><dd>${METHODS[S.method].name}</dd><dt>Compares</dt><dd>${esc(S.roles.after)} vs ${esc(S.roles.before)}, same person</dd><dt>Settings</dt><dd>Two-sided, α = 0.05</dd></dl></div>
+      <div class="panel"><h3>Checks <span class="chip rule">Rule engine</span></h3><ul class="checks" style="margin:0">${ev.checks.map(c=>`<li><span class="ic ${c.outcome==='pass'?'ok':c.outcome==='fail'?'bad':'warn'}">${c.outcome==='pass'?'✓':c.outcome==='fail'?'×':'?'}</span><span>${esc(c.label)}</span></li>`).join('')}</ul></div>
+    </div>
+    <div style="margin-top:16px">${q}</div>
+    <div class="panel" style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
+      <div class="row" style="justify-content:space-between"><span>Gate status: ${gate}</span></div>
+      <label class="radio" style="cursor:${open?'not-allowed':'pointer'}"><input type="checkbox" id="tick" ${S.tick?'checked':''} ${open?'disabled':''}><span><b>I have reviewed this plan and I approve it.</b><br><span class="small muted">Your approval is saved in the decision record with the dataset, rule and software versions.</span></span></label>
+      ${running}
+    </div>
+    <div class="footer-nav"><button class="btn" data-act="goto" data-n="3">Back</button><button class="btn accent lg" data-act="run" ${ready&&!S.running?'':'disabled'}>Approve and run</button></div></section>`;
+}
+
+/* ---------- step 5 ---------- */
+function explainText(r){
+  if(r.method==='paired_t'){
+    const size=Math.abs(r.dz)<0.2?'negligible':Math.abs(r.dz)<0.5?'small':Math.abs(r.dz)<0.8?'medium':'large';
+    const sig=r.p<0.05;
+    return `On average, the ${r.n_pairs} participants scored ${fx(Math.abs(r.mean_diff))} points ${r.mean_diff>=0?'higher':'lower'} after training than before (95% CI ${fx(r.ci_low)} to ${fx(r.ci_high)}). ${sig?'A change this large would be unlikely if scores had not really changed':'This change could plausibly be due to chance'} (${fp(r.p)}). The effect size is ${size} (d<sub>z</sub> = ${fx(r.dz,2)}). There was no comparison group, so this shows that scores ${r.mean_diff>=0?'rose':'fell'} in this group. It does not prove the training caused the change.`;
+  }
+  return `The median change across ${r.n_pairs} participants was ${sg(r.median_diff)} points. ${r.p<0.05?'Scores were reliably different after training':'The data do not show a reliable change'} (Wilcoxon signed-rank, z = ${fx(r.z,2)}, ${fp(r.p)}). There was no comparison group, so this does not prove the training caused the change.`;
+}
+function step5(){
+  const r=S.result,tab=S.tab5;
+  const tabs=`<div class="seg" role="group" aria-label="Result views" style="margin-bottom:18px"><button data-act="tab5" data-t="result" aria-pressed="${tab==='result'}">Result</button><button data-act="tab5" data-t="verify" aria-pressed="${tab==='verify'}">Verifier replay</button></div>`;
+  if(tab==='verify')return `<section class="card"><p class="eyebrow">Step 5 of 5 · Independent verifier</p><h1 class="q">Can someone else get the same result?</h1>
+    <p class="lead">A verifier loads the original data and the decision record. VERA replays the approved plan and compares every value.</p>${tabs}${verifyView()}</section>`;
+  const head=r.method==='paired_t'?`Scores were ${fx(Math.abs(r.mean_diff))} points ${r.mean_diff>=0?'higher':'lower'} after training`:`Median change of ${sg(r.median_diff)} points after training`;
+  const stats=r.method==='paired_t'?[
+    ['Mean before',fx(r.mean_before),'out of 100'],['Mean after',fx(r.mean_after),'out of 100'],['Mean change',sg(r.mean_diff),'95% CI '+fx(r.ci_low)+' to '+fx(r.ci_high)],
+    ['p-value',r.p<0.001?'< .001':r.p.toFixed(3).replace(/^0/,''),'t('+r.df+') = '+fx(r.t,2)],['Effect size',fx(r.dz,2),'Cohen’s dₓ'.replace('ₓ','z')],['Pairs analysed',r.n_pairs,profile().incomplete.length?profile().incomplete.join(', ')+' left out':'all participants']]
+    :[['Median change',sg(r.median_diff),'points'],['p-value',r.p<0.001?'< .001':r.p.toFixed(3).replace(/^0/,''),'z = '+fx(r.z,2)],['Effect size r',fx(r.r,2),''],['Pairs analysed',r.n_pairs,'']];
+  return `<section class="card"><p class="eyebrow">Step 5 of 5 · Results</p>${tabs}
+    <p class="headline">${head}</p><p class="muted" style="margin:0">${METHODS[S.method].name} · ${esc(S.details.question)}</p>
+    <div class="stats">${stats.map(([k,v,s])=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('')}</div>
+    <div class="grid2 even">
+      <div class="panel"><h3 style="margin-bottom:8px">Each participant, before and after</h3><div id="slope"></div></div>
+      <div class="stack">
+        <div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0">What this means</h3><span class="chip ai">AI-assisted · simulated</span></div>
+          <p style="margin:0">${explainText(r)}</p><p class="small muted" style="margin:8px 0 0">The wording is drafted from the computed numbers above. The numbers come from the rule-checked analysis.</p></div>
+        <div class="panel"><h3>Decision record</h3><p class="small muted">Lists the dataset fingerprint, your declarations and choices, every rule check, the approval, and the results.</p>
+          <div class="row"><button class="btn primary" data-act="dlrec">Download decision record (.json)</button><button class="btn" data-act="dlcsv">Download original data (.csv)</button></div>
+          <details style="margin-top:10px"><summary>Preview the record</summary><pre class="json">${esc(S.recordText)}</pre></details></div>
+      </div>
+    </div>
+    <div class="footer-nav"><button class="btn" data-act="restart">Start a new analysis</button><button class="btn primary lg" data-act="tab5" data-t="verify">Open verifier view</button></div></section>`;
+}
+const vf=(r,v)=>r.label==='p-value'&&v<0.0001?'< .0001':fx(v,r.d);
+function verifyView(){
+  const v=S.ver,o=v.out;
+  let res='';
+  if(o&&o.error)res=`<div class="callout bad">${esc(o.error)}</div>`;
+  else if(o){
+    const ok=o.hashMatch&&o.all&&o.prepMatch;
+    res=`<div class="verdict ${ok?'ok':'bad'}"><span class="ic ${ok?'ok':'bad'}" style="width:40px;height:40px;font-size:22px">${ok?'✓':'×'}</span><div><div class="big">${ok?'Results match':'Results do not match'}</div>
+      <div class="small">${ok?'The replay reproduced every recorded value from the same data file.':(o.hashMatch?'The data file is the same, but some values differ.':'This data file is not the one named in the record, so the replay gives different results.')}</div></div></div>
+      <div class="sumgrid" style="margin-top:14px">
+        <div class="panel"><h3>Data file</h3><p class="small" style="margin:0"><span class="${o.hashMatch?'ok-t':'bad-t'}">${o.hashMatch?'✓ Same file':'× Different file'}</span><br><span class="muted">Record: <code>${esc(o.fpRec.slice(0,22))}…</code><br>Loaded: <code>${esc(o.fpNow.slice(0,22))}…</code></span></p></div>
+        <div class="panel"><h3>Plan replayed</h3><p class="small" style="margin:0">${esc(o.method)} · ${esc(o.rule)}<br><span class="${o.prepMatch?'ok-t':'bad-t'}">${o.prepMatch?'✓':'×'} Preparation: left out ${esc(o.nowEx.join(', ')||'nobody')}</span></p></div>
+      </div>
+      <div class="tw" style="margin-top:14px"><table><thead><tr><th>Value</th><th class="num">Recorded</th><th class="num">Replayed</th><th>Match</th></tr></thead><tbody>
+      ${o.rows.map(r=>`<tr><td>${r.label}</td><td class="num">${vf(r,r.rec)}</td><td class="num">${vf(r,r.rep)}</td><td class="${r.match?'ok-t':'bad-t'}">${r.match?'✓ match':'× differs'}</td></tr>`).join('')}</tbody></table></div>`;
+  }
+  return `<div class="grid2 even">
+    <div class="filebox"><b>1. Original data</b><input type="file" id="vcsv" accept=".csv,text/csv"><span class="small muted">${v.csvName?'Loaded: '+esc(v.csvName):'No file loaded'}</span></div>
+    <div class="filebox"><b>2. Decision record</b><input type="file" id="vrec" accept=".json,application/json"><span class="small muted">${v.recName?'Loaded: '+esc(v.recName):'No file loaded'}</span></div>
+  </div>
+  <div class="row" style="margin:14px 0 18px"><button class="btn" data-act="vsession">Load this session’s files</button><button class="btn primary" data-act="vrun" ${v.csv&&v.rec?'':'disabled'}>Replay analysis</button>
+    <span class="small muted">Demo: <button class="link" data-act="vtamper">try an edited data file</button></span></div>
+  ${res}`;
+}
+function drawSlope(){
+  const el=$('#slope');if(!el)return;const P=profile(),W=420,H=280,top=20,bot=34,lx=110,rx=310;
+  const vals=P.pairs.flatMap(p=>[p.b,p.a]);const lo=Math.floor((Math.min(...vals)-3)/5)*5,hi=Math.ceil((Math.max(...vals)+3)/5)*5;
+  const y=v=>top+(hi-v)/(hi-lo)*(H-top-bot);let g='';
+  for(let v=lo;v<=hi;v+=10)g+=`<line x1="60" x2="${W-50}" y1="${y(v)}" y2="${y(v)}" stroke="#E6ECF4"/><text x="52" y="${y(v)+4}" font-size="11" text-anchor="end" fill="#5A6679">${v}</text>`;
+  const lines=P.pairs.map(p=>`<line x1="${lx}" y1="${y(p.b)}" x2="${rx}" y2="${y(p.a)}" stroke="${p.a>=p.b?'#9DB8DE':'#E3A49E'}" stroke-width="1.5"/><circle cx="${lx}" cy="${y(p.b)}" r="3" fill="#5E8FCB"/><circle cx="${rx}" cy="${y(p.a)}" r="3" fill="#5E8FCB"><title>${p.id}: ${p.b} → ${p.a}</title></circle>`).join('');
+  const mb=mean(P.pairs.map(p=>p.b)),ma=mean(P.pairs.map(p=>p.a));
+  const m=`<line x1="${lx}" y1="${y(mb)}" x2="${rx}" y2="${y(ma)}" stroke="#E5862A" stroke-width="4" stroke-linecap="round"/><circle cx="${lx}" cy="${y(mb)}" r="6" fill="#E5862A"/><circle cx="${rx}" cy="${y(ma)}" r="6" fill="#E5862A"/>
+    <text x="${lx-12}" y="${y(mb)+4}" font-size="12" font-weight="600" text-anchor="end" fill="#14254A">${fx(mb)}</text><text x="${rx+12}" y="${y(ma)+4}" font-size="12" font-weight="600" fill="#14254A">${fx(ma)}</text>`;
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Before and after scores for each participant, with the average in orange">${g}${lines}${m}
+    <text x="${lx}" y="${H-10}" font-size="13" font-weight="600" text-anchor="middle" fill="#14254A">Before</text><text x="${rx}" y="${H-10}" font-size="13" font-weight="600" text-anchor="middle" fill="#14254A">After</text></svg>
+    <p class="small muted" style="margin:4px 0 0">Blue lines: one participant each. Orange: the average. ${P.incomplete.length?esc(P.incomplete.join(', '))+' not shown (missing score).':''}</p>`;
+}
+
+/* ---------- sensitivity view ---------- */
+function ensureSens(){if(CURVE)return;CURVE=SENS_VALUES.map((v,s)=>({s,est:v[0],lo:v[1],hi:v[2]}));OBS=SENS_OBS;}
+const SLAB={stable:['STABLE','ok'],uncertain:['UNCERTAIN','ask'],reverses:['REVERSES','block']};
+function renderSens(){
+  ensureSens();const sv=S.sens,all=sv.pop==='all',o=all?CURVE[sv.shift]:OBS,st=sensStatus(o);
+  const firstUnc=CURVE.find(c=>sensStatus(c)!=='stable'),firstNeg=CURVE.find(c=>c.est<0),firstRev=CURVE.find(c=>sensStatus(c)==='reverses');
+  const msg={stable:'Training participants still score higher. The conclusion holds under this assumption.',
+    uncertain:'The interval now includes zero. Under this assumption the data cannot tell whether training participants scored higher.',
+    reverses:'Training participants now score lower. The conclusion reverses under this assumption.'}[st];
+  const shiftLabel=sv.shift===0?'As predicted from their prior grades (baseline)':sv.shift+' points lower than predicted';
+  return `<div class="synbanner"><b>SYNTHETIC EXAMPLE</b><span>Made-up data for 120 students, from Mahdi’s missing-exam case. Not real study results.</span></div>
+  <section class="card">
+    <p class="eyebrow">Sensitivity analysis</p>
+    <h1 class="q big">When does the conclusion change?</h1>
+    <p class="lead">A university offers optional training. Did participants score higher on the final exam, after accounting for prior grades? More training students missed the exam, and nobody knows what they would have scored.</p>
+    <div class="tiles">
+      <div class="tile"><div class="v">120</div><div class="k">students in the synthetic dataset</div></div>
+      <div class="tile"><div class="v" style="color:var(--orange)">24 of 60</div><div class="k">training students missed the exam</div></div>
+      <div class="tile"><div class="v">6 of 60</div><div class="k">comparison students missed the exam</div></div>
+    </div>
+    <div class="grid2">
+      <div class="stack">
+        <div><div class="row" style="justify-content:space-between;margin-bottom:6px"><label class="f" style="margin:0">Who should the conclusion cover?</label><span class="chip you">You decide</span></div>
+          <div class="seg" role="group"><button data-act="pop" data-p="all" aria-pressed="${all}">All enrolled students</button><button data-act="pop" data-p="obs" aria-pressed="${!all}">Students who took the exam</button></div></div>
+        <div ${all?'':'style="opacity:.45"'}><div class="row" style="justify-content:space-between;margin-bottom:4px"><label class="f" for="shift" style="margin:0">If the 24 absent training students had sat the exam, how would they have scored?</label><span class="chip you">You decide</span></div>
+          <input type="range" id="shift" min="0" max="24" step="1" value="${sv.shift}" ${all?'':'disabled'} aria-describedby="shiftv">
+          <div class="ticks"><span>Baseline</span><span>${MINUS}6</span><span>${MINUS}12</span><span>${MINUS}18</span><span>${MINUS}24 pts</span></div>
+          <p style="margin:8px 0 0;font-weight:600" id="shiftv">${all?shiftLabel:'Not used for this population'}</p></div>
+        <div class="sensout ${st}" id="sensout">
+          <div class="row" style="justify-content:space-between"><span class="small" style="font-weight:600">Adjusted score difference (training ${MINUS} comparison)</span><span class="pill ${SLAB[st][1]}">${SLAB[st][0]}</span></div>
+          <div class="est">${sg(o.est,2)} points</div><div class="small" style="font-variant-numeric:tabular-nums">95% interval ${sg(o.lo,2)} to ${sg(o.hi,2)}</div>
+          <p style="margin:10px 0 0">${all?msg:'This is a separate question about the '+OBS.n+' students with observed scores, so there are no missing scores to vary. Changing who the conclusion covers changes the research target, so VERA treats it as a separate analysis (S01).'}</p>
+        </div>
+      </div>
+      <div class="panel"><h3 style="margin-bottom:6px">How the estimate moves with the assumption</h3><div id="senschart"></div>
+        ${all?`<p class="small" style="margin:6px 0 0"><span class="rid">S03</span>Across the tested shifts, the interval first includes zero at <b>${firstUnc.s} points lower</b>. The estimate first turns negative at <b>${firstNeg.s} points lower</b>. The whole interval is below zero from <b>${firstRev.s} points lower</b>.</p>`:''}
+        <div class="legend3" style="margin-top:10px"><span class="pill ok">STABLE</span><span class="pill ask">UNCERTAIN</span><span class="pill block">REVERSES</span></div></div>
+    </div>
+    <div class="roles3" style="margin-top:18px">
+      <div class="panel"><h3>Data shows <span class="chip rule">Checked</span></h3>Training participation, prior grades, observed scores, and which scores are missing.</div>
+      <div class="panel"><h3>Researcher confirms <span class="chip you">You decide</span></h3>Who the conclusion covers, and the range of score shifts worth exploring. The 0–24 range here is illustrative; a real study must justify its range.</div>
+      <div class="panel"><h3>Engine computes <span class="chip sim">Simulated backend</span></h3>Draws 80 sets of missing scores from a model fitted to observed scores, shifts the absent training scores, and pools the regression estimates at each shift. Values shown are the synthetic results from Mahdi’s sensitivity lab.</div>
+    </div>
+    <details style="margin-top:16px"><summary>View scenario values</summary><div class="tw" style="margin-top:8px"><table><thead><tr><th>Absent training students</th><th class="num">Estimate</th><th class="num">95% interval</th><th>Conclusion</th></tr></thead><tbody>
+      ${[0,6,12,18,24].map(s=>{const c=CURVE[s],t=sensStatus(c);return `<tr><td>${s===0?'Baseline (as predicted)':s+' points lower'}</td><td class="num">${sg(c.est,2)}</td><td class="num">${sg(c.lo,2)} to ${sg(c.hi,2)}</td><td><span class="pill ${SLAB[t][1]}">${SLAB[t][0]}</span></td></tr>`;}).join('')}
+      <tr><td>Students who took the exam only</td><td class="num">${sg(OBS.est,2)}</td><td class="num">${sg(OBS.lo,2)} to ${sg(OBS.hi,2)}</td><td><span class="pill ${SLAB[sensStatus(OBS)][1]}">${SLAB[sensStatus(OBS)][0]}</span></td></tr></tbody></table></div></details>
+    <div class="row" style="margin-top:14px;justify-content:space-between"><p class="small muted" style="margin:0;max-width:70ch">This measures an adjusted association, not proof that training caused higher scores. Methods: controlled multiple imputation (doi:10.1002/sim.8569) and multiverse analysis (doi:10.1177/1745691616658637).</p>
+      </div>
+  </section>`;
+}
+function drawSens(){
+  const el=$('#senschart');if(!el)return;const all=S.sens.pop==='all';
+  const W=460,H=270,L=48,R=16,T=14,B=40;
+  const lo=Math.floor(Math.min(...CURVE.map(c=>c.lo),OBS.lo)-1),hi=Math.ceil(Math.max(...CURVE.map(c=>c.hi),OBS.hi)+1);
+  const x=s=>L+s/24*(W-L-R),y=v=>T+(hi-v)/(hi-lo)*(H-T-B);
+  let g='';for(let v=Math.ceil(lo/2)*2;v<=hi;v+=2)g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="#EEF2F7"/><text x="${L-6}" y="${y(v)+4}" font-size="11" text-anchor="end" fill="#5A6679">${v>0?'+':v<0?MINUS:''}${Math.abs(v)}</text>`;
+  [0,6,12,18,24].forEach(s=>g+=`<text x="${x(s)}" y="${H-B+16}" font-size="11" text-anchor="middle" fill="#5A6679">${s===0?'0':MINUS+s}</text>`);
+  const band='M'+CURVE.map(c=>x(c.s)+','+y(c.hi)).join(' L')+' L'+CURVE.slice().reverse().map(c=>x(c.s)+','+y(c.lo)).join(' L')+'Z';
+  const line='M'+CURVE.map(c=>x(c.s)+','+y(c.est)).join(' L');
+  const fu=CURVE.find(c=>sensStatus(c)!=='stable');
+  const cur=CURVE[S.sens.shift];
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Estimate and 95% interval as the assumed shift grows">${g}
+    <path d="${band}" fill="#5E8FCB" opacity="${all?.22:.1}"/><path d="${line}" fill="none" stroke="#14254A" stroke-width="2.5" opacity="${all?1:.3}"/>
+    <line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="#A8332B" stroke-dasharray="5 4" stroke-width="1.5"/><text x="${W-R}" y="${y(0)-6}" font-size="11" text-anchor="end" fill="#A8332B">no difference</text>
+    ${fu&&all?`<line x1="${x(fu.s)}" x2="${x(fu.s)}" y1="${T}" y2="${H-B}" stroke="#E5862A" stroke-width="1.5" stroke-dasharray="3 3"/><text x="${x(fu.s)+5}" y="${T+11}" font-size="11" font-weight="600" fill="#9A5B0E">tipping point</text>`:''}
+    ${all?`<line x1="${x(cur.s)}" x2="${x(cur.s)}" y1="${y(cur.lo)}" y2="${y(cur.hi)}" stroke="#E5862A" stroke-width="3"/><circle cx="${x(cur.s)}" cy="${y(cur.est)}" r="7" fill="#E5862A" stroke="#fff" stroke-width="2"/>`:''}
+    <text x="${(L+W-R)/2}" y="${H-6}" font-size="12" text-anchor="middle" fill="#18223A">Assumed shift for absent training students (points)</text></svg>`;
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click',async e=>{
+  const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const a=b.dataset.act;
+  if(a==='view'){S.view=b.dataset.v;render();window.scrollTo({top:0});}
+  else if(a==='goto'){const n=+b.dataset.n;if(n<=S.maxStep){S.step=n;render();window.scrollTo({top:0,behavior:'smooth'});}}
+  else if(a==='sample')loadData(SAMPLE_NAME,SAMPLE_CSV);
+  else if(a==='clear'){S.data=null;S.ai={};S.mode='manual';S.maxStep=1;render();}
+  else if(a==='mode'){if(b.dataset.m==='ai')aiDraft();else{S.mode='manual';Object.keys(S.ai).forEach(k=>{if(S.ai[k]==='ai')S.ai[k]='you';});render();}}
+  else if(a==='next1')go(2);
+  else if(a==='design'){S.design=b.dataset.d;S.checked=null;S.method=null;S.missing=null;S.tick=false;S.reviewed=false;S.result=null;S.maxStep=2;render();}
+  else if(a==='next2')go(3);
+  else if(a==='m3'){S.m3=b.dataset.m;render();}
+  else if(a==='check'){S.pick=$('#pick').value;S.checked=S.pick==='eligible'?(ELIGIBLE[S.design]||'paired_t'):S.pick;render();}
+  else if(a==='use'){S.method=b.dataset.m;if(S.m3==='check'){S.checked=b.dataset.m;if(S.pick!=='eligible')S.pick=b.dataset.m;}S.tick=false;S.maxStep=3;render();}
+  else if(a==='okdraft'){S.draftOk=true;render();}
+  else if(a==='undraft'){S.draftOk=false;render();}
+  else if(a==='next3')go(4);
+  else if(a==='run'){S.running=true;render();
+    S.hash=await fingerprint(S.data.text);
+    setTimeout(async()=>{S.result=runAnalysis();S.record=await buildRecord(S.result);S.recordText=JSON.stringify(S.record,null,2);S.running=false;S.tab5='result';S.ver={csv:null,csvName:'',rec:null,recName:'',out:null};go(5);},900);}
+  else if(a==='tab5'){S.tab5=b.dataset.t;render();window.scrollTo({top:0,behavior:'smooth'});}
+  else if(a==='dlrec')save('vera_decision_record.json',S.recordText);
+  else if(a==='dlcsv')save(S.data.name.replace(/\.csv$/i,'')+'.csv',S.data.text);
+  else if(a==='restart'){Object.assign(S,{step:1,maxStep:1,data:null,roles:{id:'',before:'',after:''},details:{question:'',population:''},mode:'manual',ai:{},design:null,checked:null,method:null,missing:null,tick:false,reviewed:false,draftOk:false,result:null,record:null});render();}
+  else if(a==='vsession'){S.ver={csv:S.data.text,csvName:S.data.name+' (from this session)',rec:S.recordText,recName:'vera_decision_record.json (from this session)',out:null};render();}
+  else if(a==='vtamper'){const t=S.data.text.replace(/\nP03,71,69/,'\nP03,71,85');S.ver={csv:t===S.data.text?S.data.text+' ':t,csvName:'edited copy (one after score changed)',rec:S.recordText,recName:'vera_decision_record.json (from this session)',out:null};S.ver.out=await replay(S.ver.csv,S.ver.rec);render();}
+  else if(a==='vrun'){S.ver.out=await replay(S.ver.csv,S.ver.rec);render();}
+  else if(a==='pop'){S.sens.pop=b.dataset.p;render();}
+});
+document.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.dataset.field){S.details[t.dataset.field]=t.value;if(S.ai[t.dataset.field]==='ai'){S.ai[t.dataset.field]='you';t.classList.remove('drafted');const tg=t.parentElement.querySelector('.fieldtag');if(tg){tg.className='fieldtag you';tg.textContent='Corrected by you';}}refresh1();}
+  if(t.id==='shift'){S.sens.shift=+t.value;const keep=document.activeElement===t;render();if(keep){const s=$('#shift');s&&s.focus();}}
+});
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.dataset.role){S.roles[t.dataset.role]=t.value;if(S.ai.roles==='ai')S.ai.roles='you';render();}
+  else if(t.id==='file1'&&t.files[0]){const f=t.files[0];loadData(f.name,await f.text());}
+  else if(t.name==='miss'){S.missing=t.value;S.tick=false;render();}
+  else if(t.id==='tick'){S.tick=t.checked;render();}
+  else if(t.id==='reviewed'){S.reviewed=t.checked;render();}
+  else if(t.id==='vcsv'&&t.files[0]){S.ver.csv=await t.files[0].text();S.ver.csvName=t.files[0].name;S.ver.out=null;render();}
+  else if(t.id==='vrec'&&t.files[0]){S.ver.rec=await t.files[0].text();S.ver.recName=t.files[0].name;S.ver.out=null;render();}
+});
+['dragover','dragleave','drop'].forEach(ev=>document.addEventListener(ev,async e=>{
+  const d=e.target.closest&&e.target.closest('#drop');if(!d)return;e.preventDefault();
+  if(ev==='dragover')d.classList.add('over');else d.classList.remove('over');
+  if(ev==='drop'&&e.dataTransfer.files[0]){const f=e.dataTransfer.files[0];loadData(f.name,await f.text());}
+}));
+render();
+</script>
+</body>
+</html>
